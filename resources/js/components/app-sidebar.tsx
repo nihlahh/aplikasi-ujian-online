@@ -1,36 +1,99 @@
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { MainNavItem, NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { Book, BookA, CalendarClock, GraduationCap, Home, Monitor, Server, Settings, UserRound, UsersRound } from 'lucide-react';
 import AppLogo from './app-logo';
+import { NavFooter } from './nav-footer';
+import { NavCollabsibleMain } from './nav-main';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
+const footerItem: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
+        icon: Book,
+        href: 'https://github.com/KidiXDev',
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
+        title: 'Settings',
+        icon: Settings,
+        href: '/settings/profile',
     },
 ];
+
+const items: MainNavItem[] = [
+    {
+        title: 'Dashboard',
+        icon: Home,
+        href: '/dashboard',
+    },
+    {
+        title: 'Master Data',
+        icon: Server,
+        subitem: [
+            {
+                title: 'Peserta',
+                href: '/master-data/peserta',
+                icon: UserRound,
+            },
+            {
+                title: 'Dosen',
+                href: '/master-data/dosen',
+                icon: UsersRound,
+            },
+            {
+                title: 'Kategori Ujian',
+                href: '/master-data/kategori-ujian',
+                icon: Book,
+            },
+            {
+                title: 'Jenis Ujian',
+                href: '/master-data/jenis-ujian',
+                icon: Book,
+            },
+            {
+                title: 'Soal',
+                href: '/master-data/soal',
+                icon: Book,
+            },
+        ],
+    },
+    {
+        title: 'Jadwal Ujian',
+        icon: CalendarClock,
+        href: '/jadwal-ujian',
+    },
+    {
+        title: 'Monitoring',
+        icon: Monitor,
+        href: '/monitoring-ujian',
+    },
+    {
+        title: 'Rekap Nilai',
+        icon: GraduationCap,
+        href: '/rekap-nilai',
+    },
+    {
+        title: 'Master Matakuliah',
+        icon: BookA,
+        href: '/master-matakuliah',
+    },
+];
+
+// const footerNavItems: NavItem[] = [
+//     {
+//         title: 'Repository',
+//         href: 'https://github.com/laravel/react-starter-kit',
+//         icon: Folder,
+//     },
+//     {
+//         title: 'Documentation',
+//         href: 'https://laravel.com/docs/starter-kits',
+//         icon: BookOpen,
+//     },
+// ];
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" variant="inset" className="shadow-xl shadow-black/50">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -44,12 +107,14 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                {/* <NavMain items={mainNavItems} label="Dashboard" /> */}
+                <NavCollabsibleMain items={items} />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
+                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
+                {/* <NavUser /> */}
+                <NavFooter items={footerItem} />
             </SidebarFooter>
         </Sidebar>
     );

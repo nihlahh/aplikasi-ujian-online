@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { NavUser } from './nav-user';
+import { SidebarTrigger } from './ui/sidebar';
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     return (
@@ -9,6 +9,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
             <div className="flex h-full w-full items-center justify-between">
                 <div className="flex items-center gap-2">
                     <SidebarTrigger className="-ml-1" />
+                    {/* <Menu /> */}
                     <Breadcrumbs breadcrumbs={breadcrumbs} />
                 </div>
                 <div>

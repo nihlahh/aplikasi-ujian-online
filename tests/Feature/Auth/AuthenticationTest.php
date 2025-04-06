@@ -1,9 +1,16 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Tests\TestCase;
+
+uses(TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
+    Log::info('Login screen response', ['response' => $response->getContent()]);
+    Log::info('Login screen status', ['status' => $response->status()]);
+    Log::info('Login screen status code', ['status_code' => $response->status()]);
 
     $response->assertStatus(200);
 });

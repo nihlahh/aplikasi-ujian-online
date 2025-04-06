@@ -1,6 +1,9 @@
 <?php
 
 use App\Models\User;
+use Tests\TestCase;
+
+uses(TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 test('confirm password screen can be rendered', function () {
     $user = User::factory()->create();

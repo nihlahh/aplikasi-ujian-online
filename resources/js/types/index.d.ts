@@ -37,7 +37,6 @@ export interface SubItems{
   isActive?: boolean;
 }
 
-
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
@@ -51,6 +50,7 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    roles: string[];
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;

@@ -8,7 +8,7 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { type MainNavItem, type NavItem } from '@/types';
+import { SharedData, type MainNavItem, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
@@ -35,13 +35,22 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[]; 
 }
 
 export function NavCollabsibleMain({ items, label = 'Dashboard' }: { items: MainNavItem[]; label?: string }) {
+    const { auth } = usePage<SharedData>().props;
     const page = usePage();
+
+    const visibleItems = items.filter((item) => {
+        if (item.title === 'User Management') {
+            return auth.user?.roles?.includes('super_admin');
+        }
+
+        return true;
+    });
 
     return (
         <SidebarGroup className="px-2 py-0">
             <SidebarGroupLabel>{label}</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => {
+                {visibleItems.map((item) => {
                     const isOpen = item.subitem?.some((sub) => sub.href === page.url);
 
                     // Kalau ada submenu

@@ -1,7 +1,20 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { MainNavItem, NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Book, BookA, CalendarClock, GraduationCap, Home, Monitor, Server, Settings, UserRound, UsersRound } from 'lucide-react';
+import {
+    Book,
+    BookA,
+    CalendarClock,
+    GraduationCap,
+    Home,
+    Monitor,
+    Server,
+    Settings,
+    ShieldAlert,
+    ShieldCheck,
+    UserRound,
+    UsersRound,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavFooter } from './nav-footer';
 import { NavCollabsibleMain } from './nav-main';
@@ -53,6 +66,27 @@ const items: MainNavItem[] = [
                 title: 'Soal',
                 href: '/master-data/soal',
                 icon: Book,
+            },
+        ],
+    },
+    {
+        title: 'User Management',
+        icon: Server,
+        subitem: [
+            {
+                title: 'User',
+                href: '/user-management/user',
+                icon: UserRound,
+            },
+            {
+                title: 'Roles',
+                href: '/user-management/roles',
+                icon: ShieldCheck,
+            },
+            {
+                title: 'Permissions',
+                href: '/user-management/permissions',
+                icon: ShieldAlert,
             },
         ],
     },

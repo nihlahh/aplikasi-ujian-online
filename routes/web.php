@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\MatkulController;
+use App\Http\Controllers\UserManagerController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,9 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('peserta');
     })->name('peserta');
 
-    Route::get('master-matakuliah', function () {
-        return Inertia::render('master-matakuliah');
-    })->name('master.matakuliah');
+    Route::get('master-matakuliah', [MatkulController::class, 'index'])->name('master.matakuliah');
 
     // Buat route yang punya submenu, bisa dimasukkan ke dalam group
     // contohnya kek gini buat master-data
@@ -58,6 +58,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('soal', function () {
             return Inertia::render('peserta');
         })->name('peserta');
+    });
+
+    Route::middleware(['role:super_admin'])->group(function () {
+        Route::prefix('user-management')->name('user-management.')->group(function () {
+            Route::get('/', function () {
+                return redirect()->route('dashboard');
+            })->name('index');
+
+            Route::get('user', [UserManagerController::class, 'index'])->name('user.manager');
+        });
     });
 });
 

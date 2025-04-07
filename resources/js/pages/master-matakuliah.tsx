@@ -57,6 +57,12 @@ const invoices = [
 ];
 
 export default function MasterMatakuliah() {
+    // const { title, description } = usePage().props;
+
+    // useEffect(() => {
+    //     console.log(title, description);
+    // }, []);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Master Matakuliah" />

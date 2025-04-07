@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -69,9 +69,9 @@ export default function MasterMatakuliah() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <h1 className="text-8xl">Hello World</h1>
                 <TableDemo />
-                {/* <button className="rounded bg-yellow-200 p-8" onClick={() => router.visit(route('monitoring.ujian'))}>
+                <button className="rounded bg-yellow-200 p-8" onClick={() => router.visit(route('monitoring.ujian'))}>
                     Click Me
-                </button> */}
+                </button>
             </div>
         </AppLayout>
     );

@@ -63,6 +63,9 @@
     --animate-accordion-down: accordion-down 0.2s ease-out;
     --animate-accordion-up: accordion-up 0.2s ease-out;
 
+    --color-button-primary: oklch(0.61 0.0691 260.14);
+    --color-button-danger: oklch(0.47 0.1887 28.23);
+
     @keyframes collapsible-down {
         from {
             height: 0;

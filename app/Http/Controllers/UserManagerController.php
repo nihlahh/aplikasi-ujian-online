@@ -8,12 +8,13 @@ use App\Models\User;
 
 class UserManagerController extends Controller
 {
-    function index()
+    function index(Request $request)
     {
+        $pages = $request->query('pages', 10);
         return Inertia::render(
             'user-management/user-manager',
             [
-                'users' => User::with('roles')->get()
+                'users' => User::with('roles')->paginate((int)$pages)->withQueryString()
             ]
         );
     }

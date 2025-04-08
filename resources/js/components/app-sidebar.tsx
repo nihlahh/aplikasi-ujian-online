@@ -23,7 +23,7 @@ const footerItem: NavItem[] = [
     {
         title: 'Repository',
         icon: Book,
-        href: 'https://github.com/KidiXDev',
+        href: 'https://github.com/KidiXDev/aplikasi-ujian-online',
     },
     {
         title: 'Settings',

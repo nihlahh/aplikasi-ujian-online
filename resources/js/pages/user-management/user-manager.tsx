@@ -2,12 +2,25 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import CButtonIcon from '@/components/ui/c-button-icon';
 import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
 import { Pencil, Search, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -41,22 +54,24 @@ interface PaginatedUsers {
     }[];
 }
 
+interface FlashProps {
+    success?: string;
+    error?: string;
+}
+
 type PageProps = {
     users: PaginatedUsers;
     filters: UserFilter;
+    flash: FlashProps;
 };
 
-function handleDelete(id: number) {
-    if (confirm('Are you sure you want to delete this user?')) {
-        router.delete(route('user-management.user.destroy', id), {
-            preserveState: true,
-            preserveScroll: true,
-        });
-    }
-}
-
 export default function MasterMatakuliah() {
-    const { users, filters } = usePage<PageProps>().props;
+    const { users, filters, flash } = usePage<PageProps>().props;
+
+    useEffect(() => {
+        if (flash.success) toast.success(flash.success);
+        if (flash.error) toast.error(flash.error);
+    }, [flash]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -164,101 +179,144 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
     const data = users.data;
     const paginationLinks = renderPaginationLinks(users.links, users.current_page);
 
+    const [open, setOpen] = useState(false);
+    const [targetId, setTargetId] = useState<number | null>(null);
+
+    const handleDelete = (id: number) => {
+        setTargetId(id);
+        setOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        try {
+            if (targetId !== null) {
+                await router.delete(route('user-management.user.destroy', targetId), {
+                    preserveState: true,
+                    preserveScroll: true,
+                });
+            }
+        } catch {
+            toast.error('Unexpected error occurred');
+        } finally {
+            setOpen(false);
+        }
+    };
+
     return (
-        <div className="flex flex-col gap-4">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[100px] text-center">Number</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Roles</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {data.map((user) => (
-                        <TableRow key={user.id}>
-                            <TableCell className="text-center font-medium">{user.id}</TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{RoleDecorator(user.roles.map((role) => role.name).join(', '))}</TableCell>
-                            <TableCell className="text-right">
-                                <div className="flex justify-end gap-2">
-                                    <CButtonIcon icon={Pencil} type="primary" />
-                                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
-                                </div>
-                            </TableCell>
+        <>
+            <div className="flex flex-col gap-4">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px] text-center">Number</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Roles</TableHead>
+                            <TableHead className="text-right">Action</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {data.map((user) => (
+                            <TableRow key={user.id}>
+                                <TableCell className="text-center font-medium">{user.id}</TableCell>
+                                <TableCell>{user.name}</TableCell>
+                                <TableCell>{user.email}</TableCell>
+                                <TableCell>{RoleDecorator(user.roles.map((role) => role.name).join(', '))}</TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex justify-end gap-2">
+                                        <CButtonIcon icon={Pencil} type="primary" />
+                                        <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div className="text-muted-foreground text-sm sm:order-1">
-                    Showing {Math.min(users.current_page * users.per_page, users.total)} of {users.total} entries
-                </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="text-muted-foreground text-sm sm:order-1">
+                        Showing {Math.min(users.current_page * users.per_page, users.total)} of {users.total} entries
+                    </div>
 
-                <div className="flex w-full justify-end sm:order-2 sm:w-auto">
-                    <Pagination>
-                        <PaginationContent>
-                            {paginationLinks.map((link, i) => {
-                                if (link.label === '...') {
+                    <div className="flex w-full justify-end sm:order-2 sm:w-auto">
+                        <Pagination>
+                            <PaginationContent>
+                                {paginationLinks.map((link, i) => {
+                                    if (link.label === '...') {
+                                        return (
+                                            <PaginationItem key={i}>
+                                                <span className="text-muted-foreground flex h-9 w-9 items-center justify-center text-sm">...</span>
+                                            </PaginationItem>
+                                        );
+                                    }
+
+                                    const isPrev = link.label.toLowerCase().includes('previous');
+                                    const isNext = link.label.toLowerCase().includes('next');
+                                    const isDisabled = !link.url;
+                                    const baseClasses = isDisabled
+                                        ? 'pointer-events-none opacity-50 select-none'
+                                        : 'cursor-pointer hover:bg-muted select-none';
+
+                                    if (isPrev) {
+                                        return (
+                                            <PaginationItem key={i}>
+                                                <PaginationPrevious
+                                                    onClick={() => link.url && router.visit(link.url)}
+                                                    className={`${baseClasses} border-border border transition-colors select-none`}
+                                                />
+                                            </PaginationItem>
+                                        );
+                                    }
+
+                                    if (isNext) {
+                                        return (
+                                            <PaginationItem key={i}>
+                                                <PaginationNext
+                                                    onClick={() => link.url && router.visit(link.url)}
+                                                    className={`${baseClasses} border-border border transition-colors select-none`}
+                                                />
+                                            </PaginationItem>
+                                        );
+                                    }
+
                                     return (
                                         <PaginationItem key={i}>
-                                            <span className="text-muted-foreground flex h-9 w-9 items-center justify-center text-sm">...</span>
-                                        </PaginationItem>
-                                    );
-                                }
-
-                                const isPrev = link.label.toLowerCase().includes('previous');
-                                const isNext = link.label.toLowerCase().includes('next');
-                                const isDisabled = !link.url;
-                                const baseClasses = isDisabled
-                                    ? 'pointer-events-none opacity-50 select-none'
-                                    : 'cursor-pointer hover:bg-muted select-none';
-
-                                if (isPrev) {
-                                    return (
-                                        <PaginationItem key={i}>
-                                            <PaginationPrevious
+                                            <PaginationLink
                                                 onClick={() => link.url && router.visit(link.url)}
-                                                className={`${baseClasses} border-border border transition-colors select-none`}
+                                                isActive={link.active}
+                                                className={
+                                                    link.active
+                                                        ? 'bg-button-primary border-button-primary border text-white select-none'
+                                                        : `${baseClasses} border-border border select-none`
+                                                }
+                                                dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
                                         </PaginationItem>
                                     );
-                                }
-
-                                if (isNext) {
-                                    return (
-                                        <PaginationItem key={i}>
-                                            <PaginationNext
-                                                onClick={() => link.url && router.visit(link.url)}
-                                                className={`${baseClasses} border-border border transition-colors select-none`}
-                                            />
-                                        </PaginationItem>
-                                    );
-                                }
-
-                                return (
-                                    <PaginationItem key={i}>
-                                        <PaginationLink
-                                            onClick={() => link.url && router.visit(link.url)}
-                                            isActive={link.active}
-                                            className={
-                                                link.active
-                                                    ? 'bg-button-primary border-button-primary border text-white select-none'
-                                                    : `${baseClasses} border-border border select-none`
-                                            }
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    </PaginationItem>
-                                );
-                            })}
-                        </PaginationContent>
-                    </Pagination>
+                                })}
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {/* Custom Delete Dialog */}
+            <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the selected user and remove the data from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+                        <AlertDialogAction className="bg-button-danger cursor-pointer" onClick={confirmDelete}>
+                            Continue
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 }

@@ -2,14 +2,12 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 
+import CButtonIcon from '@/components/ui/c-button-icon';
 import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pencil, Search, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-
-let debounceTimer: NodeJS.Timeout | undefined;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,6 +21,11 @@ type User = {
     name: string;
     email: string;
     roles: { name: string }[];
+};
+
+type UserFilter = {
+    search: string;
+    pages: number;
 };
 
 interface PaginatedUsers {
@@ -40,28 +43,11 @@ interface PaginatedUsers {
 
 type PageProps = {
     users: PaginatedUsers;
+    filters: UserFilter;
 };
 
-function SearchInput() {
-    const [search, setSearch] = useState('');
-
-    useEffect(() => {
-        clearTimeout(debounceTimer);
-
-        debounceTimer = setTimeout(() => {
-            router.visit(route('user-management.user.manager'), {
-                data: { search },
-                preserveState: true,
-                preserveScroll: true,
-            });
-        }, 500); // 500ms debounce delay
-    }, [search]);
-
-    return <Input type="text" placeholder="Search..." className="pl-10" onChange={(e) => setSearch(e.target.value)} />;
-}
-
 export default function MasterMatakuliah() {
-    const { users } = usePage<PageProps>().props;
+    const { users, filters } = usePage<PageProps>().props;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -96,7 +82,28 @@ export default function MasterMatakuliah() {
                         <p>entries</p>
                     </div>
                     <div className="relative w-[300px]">
-                        <SearchInput />
+                        <Input
+                            type="text"
+                            placeholder="Search..."
+                            className="pl-10"
+                            defaultValue={filters.search}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    router.visit(route('user-management.user.manager'), {
+                                        data: { search: (e.target as HTMLInputElement).value },
+                                        preserveState: true,
+                                        preserveScroll: true,
+                                    });
+                                }
+                            }}
+                            // onChange={(e) => {
+                            //     router.visit(route('user-management.user.manager'), {
+                            //         data: { search: e.target.value },
+                            //         preserveState: true,
+                            //         preserveScroll: true,
+                            //     });
+                            // }}
+                        />
                         <Search className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 transform" />
                     </div>
                 </div>
@@ -169,12 +176,8 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                             <TableCell>{RoleDecorator(user.roles.map((role) => role.name).join(', '))}</TableCell>
                             <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
-                                    <button className="bg-button-primary cursor-pointer rounded p-2 text-white shadow">
-                                        <Pencil className="h-4 w-4" />
-                                    </button>
-                                    <button className="bg-button-danger bg-sidebar-ring2 cursor-pointer rounded p-2 text-white shadow">
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
+                                    <CButtonIcon icon={Pencil} type="primary" />
+                                    <CButtonIcon icon={Trash2} type="danger" />
                                 </div>
                             </TableCell>
                         </TableRow>

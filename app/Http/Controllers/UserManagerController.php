@@ -11,10 +11,18 @@ class UserManagerController extends Controller
     function index(Request $request)
     {
         $pages = $request->query('pages', 10);
+        $search = $request->query('search', null);
+
+        $usersQuery = User::with('roles');
+        if ($search) {
+            $usersQuery->where('name', 'like', '%' . $search . '%')
+                ->orWhere('email', 'like', '%' . $search . '%');
+        }
+
         return Inertia::render(
             'user-management/user-manager',
             [
-                'users' => User::with('roles')->paginate((int)$pages)->withQueryString()
+                'users' => $usersQuery->paginate((int)$pages)->withQueryString()
             ]
         );
     }

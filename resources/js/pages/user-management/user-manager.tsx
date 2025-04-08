@@ -2,10 +2,14 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 
+import { Input } from '@/components/ui/input';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Search, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+let debounceTimer: NodeJS.Timeout | undefined;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -38,6 +42,24 @@ type PageProps = {
     users: PaginatedUsers;
 };
 
+function SearchInput() {
+    const [search, setSearch] = useState('');
+
+    useEffect(() => {
+        clearTimeout(debounceTimer);
+
+        debounceTimer = setTimeout(() => {
+            router.visit(route('user-management.user.manager'), {
+                data: { search },
+                preserveState: true,
+                preserveScroll: true,
+            });
+        }, 500); // 500ms debounce delay
+    }, [search]);
+
+    return <Input type="text" placeholder="Search..." className="pl-10" onChange={(e) => setSearch(e.target.value)} />;
+}
+
 export default function MasterMatakuliah() {
     const { users } = usePage<PageProps>().props;
 
@@ -47,30 +69,36 @@ export default function MasterMatakuliah() {
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <h1 className="text-xl font-bold">User List</h1>
-                <div className="flex items-center gap-2">
-                    <p>Show</p>
-                    <Select
-                        value={String(users.per_page)}
-                        onValueChange={(value) => {
-                            router.visit(route('user-management.user.manager'), {
-                                data: { pages: value },
-                                preserveState: true,
-                                preserveScroll: true,
-                            });
-                        }}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder={String(users.per_page)} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {[10, 12, 25, 50, 100].map((option) => (
-                                <SelectItem key={option} value={String(option)}>
-                                    {option}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <p>entries</p>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <p>Show</p>
+                        <Select
+                            value={String(users.per_page)}
+                            onValueChange={(value) => {
+                                router.visit(route('user-management.user.manager'), {
+                                    data: { pages: value },
+                                    preserveState: true,
+                                    preserveScroll: true,
+                                });
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder={String(users.per_page)} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[10, 12, 25, 50, 100].map((option) => (
+                                    <SelectItem key={option} value={String(option)}>
+                                        {option}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p>entries</p>
+                    </div>
+                    <div className="relative w-[300px]">
+                        <SearchInput />
+                        <Search className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 transform" />
+                    </div>
                 </div>
                 <UserTable props={users} />
             </div>

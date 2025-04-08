@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
 
-        // Create 50 users and assign random roles to each
-        User::factory(100)->create()->each(function ($user) {
+        // Create 500 users and assign random roles to each
+        User::factory(500)->create()->each(function ($user) {
             $role = fake()->randomElement(['admin', 'super_admin']);
             $user->assignRole($role);
         });

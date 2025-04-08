@@ -67,6 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             })->name('index');
 
             Route::get('user', [UserManagerController::class, 'index'])->name('user.manager');
+            Route::delete('user/{user}', [UserManagerController::class, 'delete'])->name('user.destroy');
         });
     });
 });

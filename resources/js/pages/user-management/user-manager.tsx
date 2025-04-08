@@ -16,17 +16,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type User = {
+interface User {
     id: number;
     name: string;
     email: string;
     roles: { name: string }[];
-};
+}
 
-type UserFilter = {
+interface UserFilter {
     search: string;
     pages: number;
-};
+}
 
 interface PaginatedUsers {
     data: User[];
@@ -45,6 +45,15 @@ type PageProps = {
     users: PaginatedUsers;
     filters: UserFilter;
 };
+
+function handleDelete(id: number) {
+    if (confirm('Are you sure you want to delete this user?')) {
+        router.delete(route('user-management.user.destroy', id), {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }
+}
 
 export default function MasterMatakuliah() {
     const { users, filters } = usePage<PageProps>().props;
@@ -177,7 +186,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                             <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
                                     <CButtonIcon icon={Pencil} type="primary" />
-                                    <CButtonIcon icon={Trash2} type="danger" />
+                                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
                                 </div>
                             </TableCell>
                         </TableRow>

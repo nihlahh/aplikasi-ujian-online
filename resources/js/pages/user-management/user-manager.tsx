@@ -2,18 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import CButtonIcon from '@/components/ui/c-button-icon';
-import { Input } from '@/components/ui/input';
 import {
     Pagination,
     PaginationContent,
@@ -23,12 +12,15 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-import { ChevronsLeftIcon, ChevronsRightIcon, Pencil, Search, Trash2 } from 'lucide-react';
+import { CAlertDialog } from '@/components/c-alert-dialog';
+import { ChevronsLeftIcon, ChevronsRightIcon, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
+import { EntriesSelector } from '@/components/ui/entries-selector';
+import { SearchInputMenu } from '@/components/ui/search-input-menu';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -73,7 +65,7 @@ type PageProps = {
     flash: FlashProps;
 };
 
-export default function MasterMatakuliah() {
+export default function UserManager() {
     const { users, filters, flash } = usePage<PageProps>().props;
 
     useEffect(() => {
@@ -88,49 +80,8 @@ export default function MasterMatakuliah() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <h1 className="text-xl font-bold">User List</h1>
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <p>Show</p>
-                        <Select
-                            value={String(users.per_page)}
-                            onValueChange={(value) => {
-                                router.visit(route('user-management.user.manager'), {
-                                    data: { pages: value },
-                                    preserveState: true,
-                                    preserveScroll: true,
-                                });
-                            }}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder={String(users.per_page)} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {[10, 12, 25, 50, 100].map((option) => (
-                                    <SelectItem key={option} value={String(option)}>
-                                        {option}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <p>entries</p>
-                    </div>
-                    <div className="relative w-[300px]">
-                        <Input
-                            type="text"
-                            placeholder="Search..."
-                            className="pl-10"
-                            defaultValue={filters.search}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    router.visit(route('user-management.user.manager'), {
-                                        data: { search: (e.target as HTMLInputElement).value },
-                                        preserveState: true,
-                                        preserveScroll: true,
-                                    });
-                                }
-                            }}
-                        />
-                        <Search className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 transform" />
-                    </div>
+                    <EntriesSelector currentValue={users.per_page} options={[10, 12, 25, 50, 100]} routeName="user-management.user.manager" />
+                    <SearchInputMenu defaultValue={filters.search} routeName="user-management.user.manager" />
                 </div>
                 <UserTable props={users} />
             </div>
@@ -438,22 +389,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                 </div>
             </div>
 
-            <AlertDialog open={open} onOpenChange={setOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the selected user and remove the data from our servers.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
-                        <AlertDialogAction className="bg-button-danger cursor-pointer" onClick={confirmDelete}>
-                            Continue
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <CAlertDialog open={open} setOpen={setOpen} onContinue={confirmDelete} />
         </>
     );
 }

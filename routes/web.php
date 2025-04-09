@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('peserta');
     })->name('peserta');
 
-    Route::get('master-matakuliah', [MatkulController::class, 'index'])->name('master.matakuliah');
+    
 
     // Buat route yang punya submenu, bisa dimasukkan ke dalam group
     // contohnya kek gini buat master-data
@@ -58,6 +58,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('soal', function () {
             return Inertia::render('peserta');
         })->name('peserta');
+
+        Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
     });
 
     Route::middleware(['role:super_admin'])->group(function () {

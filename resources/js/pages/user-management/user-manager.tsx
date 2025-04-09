@@ -14,11 +14,19 @@ import {
 } from '@/components/ui/alert-dialog';
 import CButtonIcon from '@/components/ui/c-button-icon';
 import { Input } from '@/components/ui/input';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-import { Pencil, Search, Trash2 } from 'lucide-react';
+import { ChevronsLeftIcon, ChevronsRightIcon, Pencil, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -120,13 +128,6 @@ export default function MasterMatakuliah() {
                                     });
                                 }
                             }}
-                            // onChange={(e) => {
-                            //     router.visit(route('user-management.user.manager'), {
-                            //         data: { search: e.target.value },
-                            //         preserveState: true,
-                            //         preserveScroll: true,
-                            //     });
-                            // }}
                         />
                         <Search className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 transform" />
                     </div>
@@ -148,36 +149,8 @@ function RoleDecorator(role: string) {
     }
 }
 
-function renderPaginationLinks(links: PaginatedUsers['links'], currentPage: number) {
-    const filteredLinks = [];
-    const totalPages = links.length - 2;
-
-    // Always include prev link
-    filteredLinks.push(links[0]);
-
-    // Show exactly 3 page numbers centered around current page when possible
-    let start = Math.max(1, currentPage - 1);
-    const end = Math.min(start + 2, totalPages);
-
-    // Adjust start if we hit the end boundary
-    if (end - start < 2) {
-        start = Math.max(1, end - 2);
-    }
-
-    // Add the 3 page numbers (or fewer if totalPages < 3)
-    for (let i = start; i <= end; i++) {
-        filteredLinks.push(links[i]);
-    }
-
-    // Always include next link
-    filteredLinks.push(links[links.length - 1]);
-
-    return filteredLinks;
-}
-
 function UserTable({ props: users }: { props: PaginatedUsers }) {
     const data = users.data;
-    const paginationLinks = renderPaginationLinks(users.links, users.current_page);
 
     const [open, setOpen] = useState(false);
     const [targetId, setTargetId] = useState<number | null>(null);
@@ -209,10 +182,10 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-[100px] text-center">Number</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
+                            <TableHead className="w-[400px]">Name</TableHead>
+                            <TableHead className="w-[400px]">Email</TableHead>
                             <TableHead>Roles</TableHead>
-                            <TableHead className="text-right">Action</TableHead>
+                            <TableHead className="w-[100px] text-center">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -222,8 +195,8 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                 <TableCell>{user.name}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{RoleDecorator(user.roles.map((role) => role.name).join(', '))}</TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
+                                <TableCell>
+                                    <div className="flex justify-center gap-2">
                                         <CButtonIcon icon={Pencil} type="primary" />
                                         <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
                                     </div>
@@ -241,66 +214,230 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                     <div className="flex w-full justify-end sm:order-2 sm:w-auto">
                         <Pagination>
                             <PaginationContent>
-                                {paginationLinks.map((link, i) => {
-                                    if (link.label === '...') {
-                                        return (
-                                            <PaginationItem key={i}>
-                                                <span className="text-muted-foreground flex h-9 w-9 items-center justify-center text-sm">...</span>
-                                            </PaginationItem>
-                                        );
+                                {/* Previous Page Link */}
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (users.current_page > 1) {
+                                                router.visit(route('user-management.user.manager'), {
+                                                    data: { page: users.current_page - 1 },
+                                                    preserveState: true,
+                                                    preserveScroll: true,
+                                                });
+                                            }
+                                        }}
+                                        className={
+                                            users.current_page <= 1 ? 'pointer-events-none opacity-50 select-none' : 'cursor-pointer select-none'
+                                        }
+                                    />
+                                </PaginationItem>
+                                <PaginationItem key="back-forward">
+                                    <PaginationLink
+                                        className="cursor-pointer select-none"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            router.visit(route('user-management.user.manager'), {
+                                                data: { page: 1 },
+                                                preserveState: true,
+                                                preserveScroll: true,
+                                            });
+                                        }}
+                                    >
+                                        <ChevronsLeftIcon />
+                                    </PaginationLink>
+                                </PaginationItem>
+
+                                {/* Render Page Links */}
+                                {(() => {
+                                    const displayPages = [];
+                                    const currentPage = users.current_page;
+                                    const lastPage = users.last_page;
+
+                                    // Show only 3 pages at most: current, previous, next
+                                    // Or first, current, last if at boundaries
+
+                                    // Case: 3 or fewer total pages - show all
+                                    if (lastPage <= 3) {
+                                        for (let i = 1; i <= lastPage; i++) {
+                                            displayPages.push(
+                                                <PaginationItem key={`page-${i}`}>
+                                                    <PaginationLink
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            router.visit(route('user-management.user.manager'), {
+                                                                data: { page: i },
+                                                                preserveState: true,
+                                                                preserveScroll: true,
+                                                            });
+                                                        }}
+                                                        isActive={currentPage === i}
+                                                    >
+                                                        {i}
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                            );
+                                        }
+                                    }
+                                    // Case: More than 3 pages
+                                    else {
+                                        // First page
+                                        if (currentPage === 1) {
+                                            // Show pages 1, 2, and then ellipsis
+                                            displayPages.push(
+                                                <PaginationItem key="page-1">
+                                                    <PaginationLink
+                                                        onClick={(e) => e.preventDefault()}
+                                                        isActive={true}
+                                                        className="bg-button-primary hover:bg-button-primary/90 text-white select-none"
+                                                    >
+                                                        1
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                                <PaginationItem key="page-2">
+                                                    <PaginationLink
+                                                        className="cursor-pointer select-none"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            router.visit(route('user-management.user.manager'), {
+                                                                data: { page: 2 },
+                                                                preserveState: true,
+                                                                preserveScroll: true,
+                                                            });
+                                                        }}
+                                                    >
+                                                        2
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                                <PaginationItem key="ellipsis">
+                                                    <PaginationEllipsis />
+                                                </PaginationItem>,
+                                            );
+                                        }
+                                        // Last page
+                                        else if (currentPage === lastPage) {
+                                            // Show ellipsis and then last-1, last
+                                            displayPages.push(
+                                                <PaginationItem key="ellipsis">
+                                                    <PaginationEllipsis />
+                                                </PaginationItem>,
+                                                <PaginationItem key={`page-${lastPage - 1}`}>
+                                                    <PaginationLink
+                                                        className="cursor-pointer select-none"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            router.visit(route('user-management.user.manager'), {
+                                                                data: { page: lastPage - 1 },
+                                                                preserveState: true,
+                                                                preserveScroll: true,
+                                                            });
+                                                        }}
+                                                    >
+                                                        {lastPage - 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                                <PaginationItem key={`page-${lastPage}`}>
+                                                    <PaginationLink
+                                                        onClick={(e) => e.preventDefault()}
+                                                        isActive={true}
+                                                        className="bg-button-primary hover:bg-button-primary/90 cursor-pointer text-white select-none"
+                                                    >
+                                                        {lastPage}
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                            );
+                                        }
+                                        // Middle pages
+                                        else {
+                                            // Show current-1, current, current+1
+                                            displayPages.push(
+                                                <PaginationItem key={`page-${currentPage - 1}`}>
+                                                    <PaginationLink
+                                                        className="cursor-pointer select-none"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            router.visit(route('user-management.user.manager'), {
+                                                                data: { page: currentPage - 1 },
+                                                                preserveState: true,
+                                                                preserveScroll: true,
+                                                            });
+                                                        }}
+                                                    >
+                                                        {currentPage - 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                                <PaginationItem key={`page-${currentPage}`}>
+                                                    <PaginationLink
+                                                        onClick={(e) => e.preventDefault()}
+                                                        isActive={true}
+                                                        className="bg-button-primary hover:bg-button-primary/90 cursor-pointer text-white select-none"
+                                                    >
+                                                        {currentPage}
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                                <PaginationItem key={`page-${currentPage + 1}`}>
+                                                    <PaginationLink
+                                                        className="cursor-pointer select-none"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            router.visit(route('user-management.user.manager'), {
+                                                                data: { page: currentPage + 1 },
+                                                                preserveState: true,
+                                                                preserveScroll: true,
+                                                            });
+                                                        }}
+                                                    >
+                                                        {currentPage + 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>,
+                                            );
+                                        }
                                     }
 
-                                    const isPrev = link.label.toLowerCase().includes('previous');
-                                    const isNext = link.label.toLowerCase().includes('next');
-                                    const isDisabled = !link.url;
-                                    const baseClasses = isDisabled
-                                        ? 'pointer-events-none opacity-50 select-none'
-                                        : 'cursor-pointer hover:bg-muted select-none';
+                                    return displayPages;
+                                })()}
 
-                                    if (isPrev) {
-                                        return (
-                                            <PaginationItem key={i}>
-                                                <PaginationPrevious
-                                                    onClick={() => link.url && router.visit(link.url)}
-                                                    className={`${baseClasses} border-border border transition-colors select-none`}
-                                                />
-                                            </PaginationItem>
-                                        );
-                                    }
-
-                                    if (isNext) {
-                                        return (
-                                            <PaginationItem key={i}>
-                                                <PaginationNext
-                                                    onClick={() => link.url && router.visit(link.url)}
-                                                    className={`${baseClasses} border-border border transition-colors select-none`}
-                                                />
-                                            </PaginationItem>
-                                        );
-                                    }
-
-                                    return (
-                                        <PaginationItem key={i}>
-                                            <PaginationLink
-                                                onClick={() => link.url && router.visit(link.url)}
-                                                isActive={link.active}
-                                                className={
-                                                    link.active
-                                                        ? 'bg-button-primary border-button-primary border text-white select-none'
-                                                        : `${baseClasses} border-border border select-none`
-                                                }
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
-                                        </PaginationItem>
-                                    );
-                                })}
+                                {/* Next Page Link */}
+                                <PaginationItem key="fast-forward">
+                                    <PaginationLink
+                                        className="cursor-pointer select-none"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            router.visit(route('user-management.user.manager'), {
+                                                data: { page: users.last_page },
+                                                preserveState: true,
+                                                preserveScroll: true,
+                                            });
+                                        }}
+                                    >
+                                        <ChevronsRightIcon />
+                                    </PaginationLink>
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (users.current_page < users.last_page) {
+                                                router.visit(route('user-management.user.manager'), {
+                                                    data: { page: users.current_page + 1 },
+                                                    preserveState: true,
+                                                    preserveScroll: true,
+                                                });
+                                            }
+                                        }}
+                                        className={
+                                            users.current_page >= users.last_page
+                                                ? 'pointer-events-none opacity-50 select-none'
+                                                : 'cursor-pointer select-none'
+                                        }
+                                    />
+                                </PaginationItem>
                             </PaginationContent>
                         </Pagination>
                     </div>
                 </div>
             </div>
 
-            {/* Custom Delete Dialog */}
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

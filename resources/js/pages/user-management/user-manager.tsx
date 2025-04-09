@@ -101,6 +101,7 @@ function RoleDecorator(role: string) {
 }
 
 function UserTable({ props: users }: { props: PaginatedUsers }) {
+    const { filters } = usePage<PageProps>().props;
     const data = users.data;
 
     const [open, setOpen] = useState(false);
@@ -124,6 +125,18 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
         } finally {
             setOpen(false);
         }
+    };
+
+    // Helper function to navigate with preserved search parameters
+    const navigateToPage = (page: number) => {
+        router.visit(route('user-management.user.manager'), {
+            data: {
+                page: page,
+                search: filters.search,
+            },
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
 
     return (
@@ -171,11 +184,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             if (users.current_page > 1) {
-                                                router.visit(route('user-management.user.manager'), {
-                                                    data: { page: users.current_page - 1 },
-                                                    preserveState: true,
-                                                    preserveScroll: true,
-                                                });
+                                                navigateToPage(users.current_page - 1);
                                             }
                                         }}
                                         className={
@@ -188,11 +197,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                         className="cursor-pointer select-none"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            router.visit(route('user-management.user.manager'), {
-                                                data: { page: 1 },
-                                                preserveState: true,
-                                                preserveScroll: true,
-                                            });
+                                            navigateToPage(1);
                                         }}
                                     >
                                         <ChevronsLeftIcon />
@@ -216,11 +221,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                                     <PaginationLink
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            router.visit(route('user-management.user.manager'), {
-                                                                data: { page: i },
-                                                                preserveState: true,
-                                                                preserveScroll: true,
-                                                            });
+                                                            navigateToPage(i);
                                                         }}
                                                         isActive={currentPage === i}
                                                     >
@@ -250,11 +251,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                                         className="cursor-pointer select-none"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            router.visit(route('user-management.user.manager'), {
-                                                                data: { page: 2 },
-                                                                preserveState: true,
-                                                                preserveScroll: true,
-                                                            });
+                                                            navigateToPage(2);
                                                         }}
                                                     >
                                                         2
@@ -277,11 +274,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                                         className="cursor-pointer select-none"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            router.visit(route('user-management.user.manager'), {
-                                                                data: { page: lastPage - 1 },
-                                                                preserveState: true,
-                                                                preserveScroll: true,
-                                                            });
+                                                            navigateToPage(lastPage - 1);
                                                         }}
                                                     >
                                                         {lastPage - 1}
@@ -307,11 +300,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                                         className="cursor-pointer select-none"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            router.visit(route('user-management.user.manager'), {
-                                                                data: { page: currentPage - 1 },
-                                                                preserveState: true,
-                                                                preserveScroll: true,
-                                                            });
+                                                            navigateToPage(currentPage - 1);
                                                         }}
                                                     >
                                                         {currentPage - 1}
@@ -331,11 +320,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                                         className="cursor-pointer select-none"
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            router.visit(route('user-management.user.manager'), {
-                                                                data: { page: currentPage + 1 },
-                                                                preserveState: true,
-                                                                preserveScroll: true,
-                                                            });
+                                                            navigateToPage(currentPage + 1);
                                                         }}
                                                     >
                                                         {currentPage + 1}
@@ -354,11 +339,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                         className="cursor-pointer select-none"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            router.visit(route('user-management.user.manager'), {
-                                                data: { page: users.last_page },
-                                                preserveState: true,
-                                                preserveScroll: true,
-                                            });
+                                            navigateToPage(users.last_page);
                                         }}
                                     >
                                         <ChevronsRightIcon />
@@ -369,11 +350,7 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                         onClick={(e) => {
                                             e.preventDefault();
                                             if (users.current_page < users.last_page) {
-                                                router.visit(route('user-management.user.manager'), {
-                                                    data: { page: users.current_page + 1 },
-                                                    preserveState: true,
-                                                    preserveScroll: true,
-                                                });
+                                                navigateToPage(users.current_page + 1);
                                             }
                                         }}
                                         className={

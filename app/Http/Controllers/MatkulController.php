@@ -9,7 +9,7 @@ class MatkulController extends Controller
 {
     public function index()
     {
-        return Inertia::render('master-matakuliah', [
+        return Inertia::render('matakuliah', [
             'title' => 'Master Matakuliah',
             'description' => 'Ini Pesan Dari Controller',
         ]);

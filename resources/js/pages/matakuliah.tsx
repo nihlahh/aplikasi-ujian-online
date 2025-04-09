@@ -6,8 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Master Matakuliah',
-        href: '/master-matakuliah',
+        title: 'Matakuliah',
+        href: '/matakuliah',
     },
 ];
 
@@ -67,7 +67,7 @@ export default function MasterMatakuliah() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Master Matakuliah" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h1 className="text-8xl">Hello World</h1>
+                <h1 className="text-2xl">Mata Kuliah</h1>
                 <TableDemo />
                 <button className="rounded bg-yellow-200 p-8" onClick={() => router.visit(route('monitoring.ujian'))}>
                     Click Me

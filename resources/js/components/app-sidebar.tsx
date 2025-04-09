@@ -67,6 +67,11 @@ const items: MainNavItem[] = [
                 href: '/master-data/soal',
                 icon: Book,
             },
+            {
+                title: 'Matakuliah',
+                icon: BookA,
+                href: '/master-data/matakuliah',
+            },
         ],
     },
     {
@@ -105,11 +110,7 @@ const items: MainNavItem[] = [
         icon: GraduationCap,
         href: '/rekap-nilai',
     },
-    {
-        title: 'Master Matakuliah',
-        icon: BookA,
-        href: '/master-matakuliah',
-    },
+    
 ];
 
 // const footerNavItems: NavItem[] = [

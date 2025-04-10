@@ -110,7 +110,6 @@ const items: MainNavItem[] = [
         icon: GraduationCap,
         href: '/rekap-nilai',
     },
-    
 ];
 
 // const footerNavItems: NavItem[] = [

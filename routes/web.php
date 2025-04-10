@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
+use App\Http\Controllers\UserManagerEditController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -30,7 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('peserta');
     })->name('peserta');
 
-    
+
 
     // Buat route yang punya submenu, bisa dimasukkan ke dalam group
     // contohnya kek gini buat master-data
@@ -69,7 +70,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             })->name('index');
 
             Route::get('user', [UserManagerController::class, 'index'])->name('user.manager');
+            Route::get('/user/{id}/edit', [UserManagerEditController::class, 'edit'])->name('user.edit');
+            Route::put('/user/{id}', [UserManagerEditController::class, 'update'])->name('user.update');
             Route::delete('user/{user}', [UserManagerController::class, 'delete'])->name('user.destroy');
+
+
+            Route::get('roles', function () {
+                return Inertia::render('user-management/role-manager');
+            })->name('roles');
         });
     });
 });

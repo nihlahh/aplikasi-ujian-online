@@ -25,7 +25,7 @@ import { SearchInputMenu } from '@/components/ui/search-input-menu';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'User Manager',
-        href: '/user',
+        href: '/user-management/user',
     },
 ];
 
@@ -161,7 +161,11 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                 <TableCell>{RoleDecorator(user.roles.map((role) => role.name).join(', '))}</TableCell>
                                 <TableCell>
                                     <div className="flex justify-center gap-2">
-                                        <CButtonIcon icon={Pencil} type="primary" />
+                                        <CButtonIcon
+                                            icon={Pencil}
+                                            type="primary"
+                                            onClick={() => router.visit(route('user-management.user.edit', user.id))}
+                                        />
                                         <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
                                     </div>
                                 </TableCell>

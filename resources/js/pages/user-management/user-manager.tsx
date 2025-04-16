@@ -223,6 +223,9 @@ function UserTable({ props: users }: { props: PaginatedUsers }) {
                                             displayPages.push(
                                                 <PaginationItem key={`page-${i}`}>
                                                     <PaginationLink
+                                                        className={`cursor-pointer select-none ${
+                                                            currentPage === i ? 'bg-button-primary hover:bg-button-primary/90 text-white' : ''
+                                                        }`}
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             navigateToPage(i);

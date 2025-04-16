@@ -2,7 +2,6 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 
-import CButtonIcon from '@/components/ui/c-button-icon';
 import {
     Pagination,
     PaginationContent,
@@ -19,6 +18,7 @@ import { ChevronsLeftIcon, ChevronsRightIcon, Pencil, Trash2 } from 'lucide-reac
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { CButtonIcon } from '@/components/ui/c-button';
 import { EntriesSelector } from '@/components/ui/entries-selector';
 import { SearchInputMenu } from '@/components/ui/search-input-menu';
 
@@ -78,7 +78,7 @@ export default function UserManager() {
             <Head title="User Manager" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h1 className="text-xl font-bold">User List</h1>
+                <h1 className="text-2xl font-bold">User List</h1>
                 <div className="flex items-center justify-between">
                     <EntriesSelector currentValue={users.per_page} options={[10, 12, 25, 50, 100]} routeName="user-management.user.manager" />
                     <SearchInputMenu defaultValue={filters.search} routeName="user-management.user.manager" />

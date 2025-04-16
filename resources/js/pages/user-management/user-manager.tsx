@@ -18,6 +18,7 @@ import { ChevronsLeftIcon, ChevronsRightIcon, Pencil, Trash2 } from 'lucide-reac
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { ContentTitle } from '@/components/content-title';
 import { CButtonIcon } from '@/components/ui/c-button';
 import { EntriesSelector } from '@/components/ui/entries-selector';
 import { SearchInputMenu } from '@/components/ui/search-input-menu';
@@ -78,8 +79,8 @@ export default function UserManager() {
             <Head title="User Manager" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h1 className="text-2xl font-bold">User List</h1>
-                <div className="flex items-center justify-between">
+                <ContentTitle title="User Manager" showButton />
+                <div className="mt-4 flex items-center justify-between">
                     <EntriesSelector currentValue={users.per_page} options={[10, 12, 25, 50, 100]} routeName="user-management.user.manager" />
                     <SearchInputMenu defaultValue={filters.search} routeName="user-management.user.manager" />
                 </div>

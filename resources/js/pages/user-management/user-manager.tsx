@@ -41,7 +41,7 @@ export default function UserManager() {
             <Head title="User Manager" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <ContentTitle title="User Manager" showButton />
+                <ContentTitle title="User Manager" showButton onButtonClick={() => router.visit(route('user-management.user.create'))} />
                 <div className="mt-4 flex items-center justify-between">
                     <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="user-management.user.manager" />
                     <SearchInputMenu defaultValue={filters.search} routeName="user-management.user.manager" />
@@ -101,8 +101,8 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
 
     const columns = [
         {
-            label: 'Number',
-            className: 'w-[100px]',
+            label: 'ID',
+            className: 'w-[100px] text-center',
             render: (user: User) => <div className="text-center font-medium">{user.id}</div>,
         },
         {
@@ -127,7 +127,7 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
         },
         {
             label: 'Action',
-            className: 'w-[100px]',
+            className: 'w-[100px] text-center',
             render: (user: User) => (
                 <div className="flex justify-center gap-2">
                     <CButtonIcon icon={Pencil} onClick={() => router.visit(route('user-management.user.edit', user.id))} />

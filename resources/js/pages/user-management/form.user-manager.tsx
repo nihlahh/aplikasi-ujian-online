@@ -31,7 +31,7 @@ const formSchema = z.object({
         .string()
         .optional()
         .refine((val) => !val || val.length >= 8, { message: 'Password must be at least 8 characters.' }),
-    roles: z.array(z.string()).nonempty('Please at least one item'),
+    roles: z.array(z.string()).nonempty('Please select at least one item'),
 });
 
 export default function Dashboard() {

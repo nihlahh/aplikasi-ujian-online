@@ -3,14 +3,15 @@ import clsx from "clsx";
 import { Button } from "./button";
 
 export function CButton(props: {
-    type?: "primary" | "danger";
+    type?: "primary" | "danger" | "submit";
     className?: string;
     children: React.ReactNode;
     onClick?: () => void;
 }) {
     return (
         <Button
-            onClick={props.onClick}
+            type={props.type === "submit" ? "submit" : "button"}
+            onClick={props.type === "submit" ? undefined : props.onClick}
             className={clsx(
                 props.type === "danger"
                     ? "bg-button-danger hover:bg-[#720508] bg-sidebar-ring2 cursor-pointer text-white shadow transition-colors"

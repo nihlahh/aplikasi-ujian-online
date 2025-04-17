@@ -88,3 +88,9 @@ export interface PageFilter {
     search: string;
     pages: number;
 }
+
+export type PageProps<T> = {
+    data: PaginatedResponse<T>;
+    filters: PageFilter;
+    flash: FlashProps;
+};

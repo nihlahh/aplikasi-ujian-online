@@ -3,6 +3,7 @@
 use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
+use App\Http\Controllers\UserManagerCreateController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -74,6 +75,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('{id}/edit', [UserManagerEditController::class, 'edit'])->name('edit');
                 Route::put('{id}', [UserManagerEditController::class, 'update'])->name('update');
                 Route::delete('{user}', [UserManagerController::class, 'delete'])->name('destroy');
+                Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
+                Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
             });
 
 

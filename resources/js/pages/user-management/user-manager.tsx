@@ -1,12 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
-import { FlashProps, PageFilter, PaginatedResponse, type BreadcrumbItem } from '@/types';
+import { PageFilter, PageProps, PaginatedResponse, type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 
-import { CAlertDialog } from '@/components/c-alert-dialog';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { CAlertDialog } from '@/components/c-alert-dialog';
 import { ContentTitle } from '@/components/content-title';
 import { CButtonIcon } from '@/components/ui/c-button';
 import { CustomTable } from '@/components/ui/c-table';
@@ -28,14 +28,8 @@ interface User {
     roles: { name: string }[];
 }
 
-type PageProps = {
-    users: PaginatedResponse<User>;
-    filters: PageFilter;
-    flash: FlashProps;
-};
-
 export default function UserManager() {
-    const { users, filters, flash } = usePage<PageProps>().props;
+    const { data: userData, filters, flash } = usePage<PageProps<User>>().props;
 
     useEffect(() => {
         if (flash.success) toast.success(flash.success);
@@ -49,10 +43,10 @@ export default function UserManager() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <ContentTitle title="User Manager" showButton />
                 <div className="mt-4 flex items-center justify-between">
-                    <EntriesSelector currentValue={users.per_page} options={[10, 12, 25, 50, 100]} routeName="user-management.user.manager" />
+                    <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="user-management.user.manager" />
                     <SearchInputMenu defaultValue={filters.search} routeName="user-management.user.manager" />
                 </div>
-                <UserTable props={users} />
+                <UserTable data={userData} pageFilters={filters} />
             </div>
         </AppLayout>
     );
@@ -69,9 +63,7 @@ const RoleDecorator: React.FC<{ role: string }> = ({ role }) => {
     }
 };
 
-function UserTable({ props: users }: { props: PaginatedResponse<User> }) {
-    const { filters } = usePage<PageProps>().props;
-
+function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedResponse<User>; pageFilters: PageFilter }) {
     const [open, setOpen] = useState(false);
     const [targetId, setTargetId] = useState<number | null>(null);
 
@@ -83,7 +75,7 @@ function UserTable({ props: users }: { props: PaginatedResponse<User> }) {
     const confirmDelete = async () => {
         try {
             if (targetId !== null) {
-                await router.delete(route('user-management.user.destroy', targetId), {
+                router.delete(route('user-management.user.destroy', targetId), {
                     preserveState: true,
                     preserveScroll: true,
                 });
@@ -148,13 +140,13 @@ function UserTable({ props: users }: { props: PaginatedResponse<User> }) {
     return (
         <>
             <div className="flex flex-col gap-4">
-                <CustomTable columns={columns} data={users.data} />
+                <CustomTable columns={columns} data={userData.data} />
 
                 <PaginationWrapper
-                    currentPage={users.current_page}
-                    lastPage={users.last_page}
-                    perPage={users.per_page}
-                    total={users.total}
+                    currentPage={userData.current_page}
+                    lastPage={userData.last_page}
+                    perPage={userData.per_page}
+                    total={userData.total}
                     onNavigate={navigateToPage}
                 />
             </div>

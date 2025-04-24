@@ -9,8 +9,8 @@ class Matakuliah extends Model
 {
     use HasFactory;
     
-    // Gunakan koneksi database yang sesuai
-    protected $connection = 'data_db'; // Koneksi ini mengarah ke database 'hitam'
+    // Gunakan koneksi ke database hitam
+    protected $connection = 'data_db';
     
     // Nama tabel di database
     protected $table = 'tblmatkul';
@@ -18,7 +18,7 @@ class Matakuliah extends Model
     // Kunci utama tabel
     protected $primaryKey = 'id_mk';
     
-    // Nonaktifkan timestamps karena tabel mungkin tidak memiliki kolom created_at/updated_at
+    // Nonaktifkan timestamps karena tabel tidak memiliki kolom created_at/updated_at
     public $timestamps = false;
     
     // Kolom yang bisa diisi secara massal

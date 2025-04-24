@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -33,6 +35,12 @@ interface MatakuliahFormData {
   [key: string]: string | number | null | undefined;
 }
 
+// Interface untuk data dosen
+interface Dosen {
+  id: number;
+  name: string;
+}
+
 // Objek default untuk matakuliah baru
 const defaultMatakuliah: Matakuliah = {
   kode_mk: '',
@@ -45,10 +53,11 @@ const defaultMatakuliah: Matakuliah = {
 };
 
 export default function MatakuliahForm() {
-  // Ambil data dari props
-  const { isEdit, matakuliah: serverMatakuliah, errors, flash } = usePage<PageProps<{
+  // Ambil data dari props dengan tipe data yang benar untuk dosen_list
+  const { isEdit, matakuliah: serverMatakuliah, errors, flash, dosen_list = [] } = usePage<PageProps<{
     isEdit: boolean;
     matakuliah?: Partial<Matakuliah>;
+    dosen_list: Dosen[];
   }>>().props;
   
   // Gabungkan data dari server dengan default untuk TypeScript safety
@@ -169,21 +178,33 @@ export default function MatakuliahForm() {
               </div>
 
               <div>
-                <Label htmlFor="id_dosen">ID Dosen</Label>
-                <Input 
-                  id="id_dosen"
-                  type="number"
-                  value={form.data.id_dosen ?? ''}
-                  onChange={(e) => form.setData('id_dosen', e.target.value ? Number(e.target.value) : null)}
-                />
+                <Label htmlFor="id_dosen">Dosen Pengampu</Label>
+                <Select 
+                  value={form.data.id_dosen?.toString() ?? ''}
+                  onValueChange={(value) => form.setData('id_dosen', value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Pilih Dosen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Dosen</SelectLabel>
+                      <SelectItem value="">-- Tidak Ada --</SelectItem>
+                      {Array.isArray(dosen_list) && dosen_list.map((dosen) => (
+                        <SelectItem key={dosen.id} value={dosen.id.toString()}>
+                          {dosen.name} ({dosen.id})
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
                 {errors.id_dosen && <p className="text-sm text-red-500">{errors.id_dosen}</p>}
               </div>
 
               <div>
                 <Label htmlFor="prasyarat">Prasyarat</Label>
-                <Input 
+                <Textarea 
                   id="prasyarat"
-                  type="text"
                   value={form.data.prasyarat ?? ''}
                   onChange={(e) => form.setData('prasyarat', e.target.value)}
                 />

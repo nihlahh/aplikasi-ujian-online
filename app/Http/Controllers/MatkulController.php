@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Matakuliah;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class MatkulController extends Controller
@@ -22,9 +24,26 @@ class MatkulController extends Controller
             $query->where('kode_mk', 'like', '%' . $search . '%')
                   ->orWhere('nama_mk', 'like', '%' . $search . '%');
         }
+
+        // Ambil total data untuk validasi pagination
+        $totalData = $query->count();
+        
+        // Hitung maksimum halaman yang valid
+        $perPage = (int)$pages;
+        $maxPage = ceil($totalData / $perPage);
+        
+        // Validasi page sesuai data yang tersedia
+        $currentPage = $request->query('page', 1);
+        if ($currentPage > $maxPage && $maxPage > 0) {
+            return redirect()->route('master-data.matakuliah.index', [
+                'page' => $maxPage,
+                'pages' => $pages,
+                'search' => $search
+            ]);
+        }
         
         // Ambil data dengan pagination
-        $matakuliahs = $query->paginate((int)$pages)->withQueryString();
+        $matakuliahs = $query->paginate($perPage)->withQueryString();
         
         // Format data untuk frontend
         $matakuliahs->through(function ($matakuliah) {
@@ -47,32 +66,48 @@ class MatkulController extends Controller
                     'search' => $search,
                     'pages' => $pages,
                 ],
+                'dosen_list' => $this->getDosenList()
             ]
         );
     }
     
+    // Fungsi untuk mendapatkan daftar dosen
+    private function getDosenList()
+    {
+        // Komentar: 
+        // Sesuaikan query ini dengan tabel dan koneksi database yang benar
+        // Opsi 1: Jika menggunakan tabel users dari database utama
+        return User::select('id', 'name')->get();
+        
+        // Opsi 2: Jika ada tabel dosen khusus di database lain
+        // return \DB::connection('data_db')->table('dosen')
+        //    ->select('id_dosen as id', 'nama_dosen as name')
+        //    ->get();
+    }
+    
     public function create()
     {
-        return Inertia::render('matakuliah/matakuliah-form', [
+        return Inertia::render('matakuliah/form.matakuliah', [
             'isEdit' => false,
+            'dosen_list' => $this->getDosenList()
         ]);
     }
     
     public function store(Request $request)
     {
         // Validasi data yang diinput
-        $validated = $request->validate([
-            'kode_mk' => 'required|unique:tblmatkul,kode_mk',
-            'nama_mk' => 'required',
+        $request->validate([
+            'kode_mk' => 'required|string|max:10|unique:data_db.tblmatkul,kode_mk',
+            'nama_mk' => 'required|string|max:255',
             'sks' => 'required|integer|min:1',
             'semester' => 'required|integer|min:1|max:8',
-            'prodi' => 'required',
+            'prodi' => 'required|string|max:255',
             'id_dosen' => 'nullable|integer',
             'prasyarat' => 'nullable|string',
         ]);
         
         // Buat data matakuliah baru
-        Matakuliah::create($validated);
+        Matakuliah::create($request->all());
         
         // Redirect ke halaman daftar dengan pesan sukses
         return redirect()->route('master-data.matakuliah.index')
@@ -81,27 +116,33 @@ class MatkulController extends Controller
     
     public function edit(Matakuliah $matakuliah)
     {
-        return Inertia::render('matakuliah/matakuliah-form', [
+        return Inertia::render('matakuliah/form.matakuliah', [
             'isEdit' => true,
             'matakuliah' => $matakuliah,
+            'dosen_list' => $this->getDosenList()
         ]);
     }
     
     public function update(Request $request, Matakuliah $matakuliah)
     {
         // Validasi data yang diinput
-        $validated = $request->validate([
-            'kode_mk' => 'required|unique:tblmatkul,kode_mk,'.$matakuliah->id_mk.',id_mk',
-            'nama_mk' => 'required',
+        $request->validate([
+            'kode_mk' => [
+                'required',
+                'string',
+                'max:10',
+                Rule::unique('data_db.tblmatkul', 'kode_mk')->ignore($matakuliah->id_mk, 'id_mk')
+            ],
+            'nama_mk' => 'required|string|max:255',
             'sks' => 'required|integer|min:1',
             'semester' => 'required|integer|min:1|max:8',
-            'prodi' => 'required',
+            'prodi' => 'required|string|max:255',
             'id_dosen' => 'nullable|integer',
             'prasyarat' => 'nullable|string',
         ]);
         
         // Update data matakuliah
-        $matakuliah->update($validated);
+        $matakuliah->update($request->all());
         
         // Redirect dengan pesan sukses
         return redirect()->route('master-data.matakuliah.index')

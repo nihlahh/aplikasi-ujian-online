@@ -3,6 +3,8 @@
 use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
+use App\Http\Controllers\BankSoalController;
+use App\Http\Controllers\JenisUjianController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -56,10 +58,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('peserta');
         })->name('peserta');
 
-        Route::get('soal', function () {
+        Route::get('jenisujian', [JenisUjianController::class, 'index']);
+
+        Route::get('paket-soal', function () {
             return Inertia::render('peserta');
         })->name('peserta');
 
+        // Route show bank soal
+        Route::get('bank-soal', [BankSoalController::class, 'index'])->name('bank.soal');
+
+        // Route hapus bank soal
+        Route::delete('bank-soal/{id}', [BankSoalController::class, 'destroy'])->name('bank.soal.destroy');
+
+        // Route edit bank soal
+        Route::put('bank-soal/update/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
+        Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
+
+        // Route tambah bank soal
+        Route::get('bank-soal/create', function () {
+            return Inertia::render('banksoalcreate');
+        })->name('bank.soal.create');
+        
+        Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
+        
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
     });
 

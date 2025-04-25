@@ -1,7 +1,7 @@
 // Import yang diperlukan
 import AppLayout from '@/layouts/app-layout';
 import { PageProps, type BreadcrumbItem } from '@/types';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,10 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from '@/components/ui/textarea';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 // Interface untuk data mata kuliah
 interface Matakuliah {
@@ -21,18 +25,6 @@ interface Matakuliah {
   prodi: string;
   id_dosen?: number | null;
   prasyarat?: string | null;
-}
-
-// Interface untuk form data
-interface MatakuliahFormData {
-  kode_mk: string;
-  nama_mk: string;
-  sks: number;
-  semester: number;
-  prodi: string;
-  id_dosen: number | null;
-  prasyarat: string | null;
-  [key: string]: string | number | null | undefined;
 }
 
 // Interface untuk data dosen
@@ -51,6 +43,17 @@ const defaultMatakuliah: Matakuliah = {
   id_dosen: null,
   prasyarat: ''
 };
+
+// Schema validasi Zod untuk form matakuliah
+const formSchema = z.object({
+  kode_mk: z.string().min(1, { message: 'Kode mata kuliah wajib diisi' }).max(10, { message: 'Kode mata kuliah maksimal 10 karakter' }),
+  nama_mk: z.string().min(2, { message: 'Nama mata kuliah wajib diisi minimal 2 karakter' }),
+  sks: z.number().min(1, { message: 'SKS minimal 1' }),
+  semester: z.number().min(1, { message: 'Semester minimal 1' }).max(8, { message: 'Semester maksimal 8' }),
+  prodi: z.string().min(1, { message: 'Program studi wajib diisi' }),
+  id_dosen: z.number().nullable(),
+  prasyarat: z.string().nullable(),
+});
 
 export default function MatakuliahForm() {
   // Ambil data dari props dengan tipe data yang benar untuk dosen_list
@@ -78,36 +81,60 @@ export default function MatakuliahForm() {
     },
   ];
 
-  // Inisialisasi form
-  const form = useForm<MatakuliahFormData>({
-    kode_mk: matakuliah.kode_mk,
-    nama_mk: matakuliah.nama_mk,
-    sks: matakuliah.sks,
-    semester: matakuliah.semester,
-    prodi: matakuliah.prodi,
-    id_dosen: matakuliah.id_dosen ?? null,
-    prasyarat: matakuliah.prasyarat ?? '',
+  // Inisialisasi form dengan react-hook-form dan zod resolver
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      kode_mk: String(matakuliah.kode_mk || ''),
+      nama_mk: matakuliah.nama_mk,
+      sks: matakuliah.sks,
+      semester: matakuliah.semester,
+      prodi: matakuliah.prodi,
+      id_dosen: matakuliah.id_dosen,
+      prasyarat: matakuliah.prasyarat || '',
+    },
   });
 
   // Tampilkan pesan flash
   useEffect(() => {
     if (flash.success) toast.success(flash.success);
     if (flash.error) toast.error(flash.error);
-  }, [flash]);
+    
+    // Tampilkan error dari Laravel validasi jika ada
+    if (errors) {
+      Object.entries(errors).forEach(([key, value]) => {
+        form.setError(key as any, {
+          type: 'manual',
+          message: value as string,
+        });
+      });
+    }
+  }, [flash, errors]);
 
   // Handler submit form
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Konversi kode_mk ke string terlebih dahulu
-    form.setData('kode_mk', String(form.data.kode_mk || ''));
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    // Memastikan kode_mk adalah string
+    const formData = {
+      ...values,
+      kode_mk: String(values.kode_mk),
+    };
     
     if (isEdit && matakuliah.id_mk) {
       // Update data
-      form.put(route('master-data.matakuliah.update', matakuliah.id_mk));
+      router.put(route('master-data.matakuliah.update', matakuliah.id_mk), formData, {
+        onError: (errors) => {
+          console.error('Error:', errors);
+        },
+        preserveScroll: true,
+      });
     } else {
       // Simpan data baru
-      form.post(route('master-data.matakuliah.store'));
+      router.post(route('master-data.matakuliah.store'), formData, {
+        onError: (errors) => {
+          console.error('Error:', errors);
+        },
+        preserveScroll: true,
+      });
     }
   };
 
@@ -121,112 +148,165 @@ export default function MatakuliahForm() {
             <CardTitle>{isEdit ? 'Edit Mata Kuliah' : 'Tambah Mata Kuliah'}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label htmlFor="kode_mk">Kode Mata Kuliah</Label>
-                <Input 
-                  id="kode_mk"
-                  type="text"
-                  value={String(form.data.kode_mk || '')}
-                  onChange={(e) => form.setData('kode_mk', e.target.value)}
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="kode_mk"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kode Mata Kuliah</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Masukkan kode mata kuliah"
+                          {...field}
+                          value={String(field.value || '')}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.kode_mk && <p className="text-sm text-red-500">{errors.kode_mk}</p>}
-              </div>
-              
-              <div>
-                <Label htmlFor="nama_mk">Nama Mata Kuliah</Label>
-                <Input 
-                  id="nama_mk"
-                  type="text"
-                  value={form.data.nama_mk}
-                  onChange={(e) => form.setData('nama_mk', e.target.value)}
+                
+                <FormField
+                  control={form.control}
+                  name="nama_mk"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nama Mata Kuliah</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Masukkan nama mata kuliah"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.nama_mk && <p className="text-sm text-red-500">{errors.nama_mk}</p>}
-              </div>
-              
-              <div>
-                <Label htmlFor="sks">SKS</Label>
-                <Input 
-                  id="sks"
-                  type="number"
-                  min="1"
-                  value={form.data.sks}
-                  onChange={(e) => form.setData('sks', Number(e.target.value))}
+                
+                <FormField
+                  control={form.control}
+                  name="sks"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>SKS</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min={1}
+                          placeholder="Masukkan jumlah SKS"
+                          {...field}
+                          onChange={e => field.onChange(parseInt(e.target.value) || 1)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.sks && <p className="text-sm text-red-500">{errors.sks}</p>}
-              </div>
-              
-              <div>
-                <Label htmlFor="semester">Semester</Label>
-                <Input 
-                  id="semester"
-                  type="number"
-                  min="1"
-                  max="8"
-                  value={form.data.semester}
-                  onChange={(e) => form.setData('semester', Number(e.target.value))}
+                
+                <FormField
+                  control={form.control}
+                  name="semester"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Semester</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min={1}
+                          max={8}
+                          placeholder="Masukkan semester"
+                          {...field}
+                          onChange={e => field.onChange(parseInt(e.target.value) || 1)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.semester && <p className="text-sm text-red-500">{errors.semester}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="prodi">Program Studi</Label>
-                <Input 
-                  id="prodi"
-                  type="text"
-                  value={form.data.prodi}
-                  onChange={(e) => form.setData('prodi', e.target.value)}
+                
+                <FormField
+                  control={form.control}
+                  name="prodi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Program Studi</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Masukkan program studi"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.prodi && <p className="text-sm text-red-500">{errors.prodi}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="id_dosen">Dosen Pengampu</Label>
-                <Select 
-                  value={form.data.id_dosen?.toString() || undefined}
-                  onValueChange={(value) => form.setData('id_dosen', value ? parseInt(value) : null)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pilih Dosen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Dosen</SelectLabel>
-                      <SelectItem value="null">-- Tidak Ada --</SelectItem>
-                      {Array.isArray(dosen_list) && dosen_list.map((dosen) => (
-                        <SelectItem key={dosen.id} value={dosen.id.toString()}>
-                          {dosen.name} ({dosen.id})
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                {errors.id_dosen && <p className="text-sm text-red-500">{errors.id_dosen}</p>}
-              </div>
-
-              <div>
-                <Label htmlFor="prasyarat">Prasyarat</Label>
-                <Textarea 
-                  id="prasyarat"
-                  value={form.data.prasyarat ?? ''}
-                  onChange={(e) => form.setData('prasyarat', e.target.value)}
+                
+                <FormField
+                  control={form.control}
+                  name="id_dosen"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dosen Pengampu</FormLabel>
+                      <Select 
+                        value={field.value?.toString() || undefined}
+                        onValueChange={(value) => field.onChange(value === 'null' ? null : parseInt(value))}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih dosen pengampu" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Dosen</SelectLabel>
+                            <SelectItem value="null">-- Tidak Ada --</SelectItem>
+                            {Array.isArray(dosen_list) && dosen_list.map((dosen) => (
+                              <SelectItem key={dosen.id} value={dosen.id.toString()}>
+                                {dosen.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.prasyarat && <p className="text-sm text-red-500">{errors.prasyarat}</p>}
-              </div>
-              
-              <div className="flex gap-4">
-                <Button type="submit" disabled={form.processing}>
-                  {isEdit ? 'Update' : 'Simpan'}
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => router.visit(route('master-data.matakuliah.index'))}
-                >
-                  Batal
-                </Button>
-              </div>
-            </form>
+                
+                <FormField
+                  control={form.control}
+                  name="prasyarat"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prasyarat</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Masukkan prasyarat mata kuliah (opsional)"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex gap-4">
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    {isEdit ? 'Update' : 'Simpan'}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => router.visit(route('master-data.matakuliah.index'))}
+                  >
+                    Batal
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </div>

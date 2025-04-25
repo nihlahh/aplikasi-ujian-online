@@ -1,3 +1,4 @@
+import { PasswordInput } from '@/components/c-password-input';
 import {
     MultiSelector,
     MultiSelectorContent,
@@ -6,7 +7,6 @@ import {
     MultiSelectorList,
     MultiSelectorTrigger,
 } from '@/components/multi-select';
-import { Button } from '@/components/ui/button';
 import { CButton } from '@/components/ui/c-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -15,60 +15,100 @@ import { type BreadcrumbItem, Role, User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'User Manager',
-        href: '/user-management/user',
-    },
-    {
-        title: 'Edit',
-        href: '/edit',
-    },
-];
+interface UserWithPassword extends User {
+    password: string;
+}
 
 const formSchema = z.object({
     username: z.string().min(2, {
         message: 'Username must be at least 2 characters.',
     }),
-    email: z.string().min(2, {
-        message: 'Email must be at least 2 characters.',
-    }),
-    roles: z.array(z.string()).nonempty('Please at least one item'),
+    email: z.string().email('Invalid email address.'),
+    password: z
+        .string()
+        .optional()
+        .refine((val) => !val || val.length >= 8, { message: 'Password must be at least 8 characters.' }),
+    roles: z.array(z.string()).nonempty('Please select at least one item'),
 });
 
 export default function Dashboard() {
-    const { user, allRoles } = usePage<{ user: User; allRoles: Role[] }>().props;
+    const { user, allRoles } = usePage<{ user: UserWithPassword; allRoles: Role[] }>().props;
+    const isEdit = !!user;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'User Manager',
+            href: '/user-management/user',
+        },
+        {
+            title: isEdit ? 'Edit' : 'Create',
+            href: isEdit ? '/edit' : '/create',
+        },
+    ];
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: user.name,
-            email: user.email,
-            roles: user.roles,
+            username: user?.name ?? '',
+            email: user?.email ?? '',
+            password: '',
+            roles: user?.roles?.length ? user.roles : [],
         },
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values);
-        router.put(
-            route('user-management.user.update', user.id),
-            {
-                name: values.username,
-                email: values.email,
-                roles: values.roles,
-            },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    console.log('User updated successfully!');
+        if (isEdit) {
+            router.put(
+                route('user-management.user.update', user.id),
+                {
+                    name: values.username,
+                    email: values.email,
+                    roles: values.roles,
                 },
-                onError: (errors) => {
-                    console.error('Error:', errors);
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        console.log('User updated successfully!');
+                    },
+                    onError: (errors) => {
+                        console.error('Error:', errors);
+                        if (errors.email) {
+                            toast.error(errors.email);
+                        }
+                    },
                 },
-            },
-        );
+            );
+        } else {
+            router.post(
+                route('user-management.user.store'),
+                {
+                    name: values.username,
+                    email: values.email,
+                    password: values.password,
+                    roles: values.roles,
+                },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        console.log('User created successfully!');
+                    },
+                    onError: (errors) => {
+                        console.error('Error:', errors);
+                        if (errors.email) {
+                            toast.error(errors.email);
+                        }
+
+                        if (errors.password) {
+                            toast.error(errors.password);
+                        }
+                    },
+                },
+            );
+        }
     }
 
     return (
@@ -76,7 +116,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="space-between flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Edit User</h1>
+                    <h1 className="text-2xl font-bold">{isEdit ? 'Edit' : 'Create'} User</h1>
                     <CButton type="primary" className="md:w-24" onClick={() => router.visit(route('user-management.user.manager'))}>
                         Back
                     </CButton>
@@ -109,6 +149,21 @@ export default function Dashboard() {
                                 </FormItem>
                             )}
                         />
+                        {!isEdit && (
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <PasswordInput placeholder="Password" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
                         <FormField
                             control={form.control}
                             name="roles"
@@ -135,9 +190,7 @@ export default function Dashboard() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="bg-button-primary cursor-pointer text-white shadow transition-colors hover:bg-[#475873]">
-                            Save
-                        </Button>
+                        <CButton type="submit">Save</CButton>
                     </form>
                 </Form>
             </div>

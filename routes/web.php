@@ -95,6 +95,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('{id}/edit', [UserManagerEditController::class, 'edit'])->name('edit');
                 Route::put('{id}', [UserManagerEditController::class, 'update'])->name('update');
                 Route::delete('{user}', [UserManagerController::class, 'delete'])->name('destroy');
+                Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
+                Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
             });
 
 

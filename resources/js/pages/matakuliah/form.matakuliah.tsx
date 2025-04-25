@@ -5,7 +5,6 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useEffect } from 'react';
@@ -103,13 +102,13 @@ export default function MatakuliahForm() {
     // Tampilkan error dari Laravel validasi jika ada
     if (errors) {
       Object.entries(errors).forEach(([key, value]) => {
-        form.setError(key as any, {
+        form.setError(key as keyof typeof form.formState.errors, {
           type: 'manual',
           message: value as string,
         });
       });
     }
-  }, [flash, errors]);
+  }, [flash, errors, form]);
 
   // Handler submit form
   const onSubmit = (values: z.infer<typeof formSchema>) => {

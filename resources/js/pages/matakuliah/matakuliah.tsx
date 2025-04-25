@@ -15,7 +15,6 @@ import { CustomTable } from '@/components/ui/c-table'; // Tabel custom
 import { EntriesSelector } from '@/components/ui/entries-selector'; // Pilihan berapa data per halaman
 import { PaginationWrapper } from '@/components/ui/pagination-wrapper'; // Navigasi halaman
 import { SearchInputMenu } from '@/components/ui/search-input-menu'; // Pencarian
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Tooltip untuk prasyarat
 
 // Breadcrumb buat navigasi
 const breadcrumbs: BreadcrumbItem[] = [

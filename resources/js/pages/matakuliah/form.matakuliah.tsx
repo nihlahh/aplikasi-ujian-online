@@ -99,6 +99,9 @@ export default function MatakuliahForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Konversi kode_mk ke string terlebih dahulu
+    form.setData('kode_mk', String(form.data.kode_mk || ''));
+    
     if (isEdit && matakuliah.id_mk) {
       // Update data
       form.put(route('master-data.matakuliah.update', matakuliah.id_mk));
@@ -124,7 +127,7 @@ export default function MatakuliahForm() {
                 <Input 
                   id="kode_mk"
                   type="text"
-                  value={form.data.kode_mk}
+                  value={String(form.data.kode_mk || '')}
                   onChange={(e) => form.setData('kode_mk', e.target.value)}
                 />
                 {errors.kode_mk && <p className="text-sm text-red-500">{errors.kode_mk}</p>}
@@ -180,7 +183,7 @@ export default function MatakuliahForm() {
               <div>
                 <Label htmlFor="id_dosen">Dosen Pengampu</Label>
                 <Select 
-                  value={form.data.id_dosen?.toString() ?? ''}
+                  value={form.data.id_dosen?.toString() || undefined}
                   onValueChange={(value) => form.setData('id_dosen', value ? parseInt(value) : null)}
                 >
                   <SelectTrigger className="w-full">
@@ -189,7 +192,7 @@ export default function MatakuliahForm() {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Dosen</SelectLabel>
-                      <SelectItem value="">-- Tidak Ada --</SelectItem>
+                      <SelectItem value="null">-- Tidak Ada --</SelectItem>
                       {Array.isArray(dosen_list) && dosen_list.map((dosen) => (
                         <SelectItem key={dosen.id} value={dosen.id.toString()}>
                           {dosen.name} ({dosen.id})

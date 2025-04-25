@@ -16,8 +16,8 @@ class MatkulController extends Controller
         $pages = $request->query('pages', 10);
         $search = $request->query('search', null);
         
-        // Buat query dasar
-        $query = Matakuliah::query();
+        // Buat query dasar dengan relasi dosen
+        $query = Matakuliah::with('dosen');
         
         // Tambahkan pencarian jika parameter search ada
         if ($search) {
@@ -54,6 +54,9 @@ class MatkulController extends Controller
                 'sks' => $matakuliah->sks,
                 'semester' => $matakuliah->semester,
                 'prodi' => $matakuliah->prodi,
+                'id_dosen' => $matakuliah->id_dosen,
+                'nama_dosen' => $matakuliah->dosen ? $matakuliah->dosen->name : '-',
+                'prasyarat' => $matakuliah->prasyarat ?: '-'
             ];
         });
         
@@ -74,15 +77,16 @@ class MatkulController extends Controller
     // Fungsi untuk mendapatkan daftar dosen
     private function getDosenList()
     {
-        // Komentar: 
-        // Sesuaikan query ini dengan tabel dan koneksi database yang benar
-        // Opsi 1: Jika menggunakan tabel users dari database utama
-        return User::select('id', 'name')->get();
-        
-        // Opsi 2: Jika ada tabel dosen khusus di database lain
-        // return \DB::connection('data_db')->table('dosen')
-        //    ->select('id_dosen as id', 'nama_dosen as name')
-        //    ->get();
+        // Mengambil data dosen dari model User
+        return User::select('id', 'name')
+            ->orderBy('name')
+            ->get()
+            ->map(function($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name
+                ];
+            });
     }
     
     public function create()
@@ -102,7 +106,7 @@ class MatkulController extends Controller
             'sks' => 'required|integer|min:1',
             'semester' => 'required|integer|min:1|max:8',
             'prodi' => 'required|string|max:255',
-            'id_dosen' => 'nullable|integer',
+            'id_dosen' => 'nullable|integer|exists:users,id',
             'prasyarat' => 'nullable|string',
         ]);
         
@@ -125,6 +129,13 @@ class MatkulController extends Controller
     
     public function update(Request $request, Matakuliah $matakuliah)
     {
+        // Mengkonversi kode_mk ke string terlebih dahulu
+        $data = $request->all();
+        if (isset($data['kode_mk'])) {
+            $data['kode_mk'] = (string)$data['kode_mk'];
+            $request->merge(['kode_mk' => $data['kode_mk']]); // Merge kembali ke request
+        }
+        
         // Validasi data yang diinput
         $request->validate([
             'kode_mk' => [
@@ -137,12 +148,12 @@ class MatkulController extends Controller
             'sks' => 'required|integer|min:1',
             'semester' => 'required|integer|min:1|max:8',
             'prodi' => 'required|string|max:255',
-            'id_dosen' => 'nullable|integer',
+            'id_dosen' => 'nullable|integer|exists:users,id',
             'prasyarat' => 'nullable|string',
         ]);
         
-        // Update data matakuliah
-        $matakuliah->update($request->all());
+        // Update data matakuliah dengan data yang sudah dikonversi
+        $matakuliah->update($data);
         
         // Redirect dengan pesan sukses
         return redirect()->route('master-data.matakuliah.index')

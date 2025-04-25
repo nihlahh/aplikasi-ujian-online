@@ -15,6 +15,7 @@ import { CustomTable } from '@/components/ui/c-table'; // Tabel custom
 import { EntriesSelector } from '@/components/ui/entries-selector'; // Pilihan berapa data per halaman
 import { PaginationWrapper } from '@/components/ui/pagination-wrapper'; // Navigasi halaman
 import { SearchInputMenu } from '@/components/ui/search-input-menu'; // Pencarian
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Tooltip untuk prasyarat
 
 // Breadcrumb buat navigasi
 const breadcrumbs: BreadcrumbItem[] = [
@@ -32,6 +33,9 @@ interface Matakuliah {
   sks: number;
   semester: number;
   prodi: string;
+  id_dosen: number | null;
+  nama_dosen: string;
+  prasyarat: string;
 }
 
 export default function MataKuliahManager() {
@@ -111,6 +115,28 @@ export default function MataKuliahManager() {
     {
       label: 'Prodi',
       render: (mk: Matakuliah) => mk.prodi,
+    },
+    {
+      label: 'Dosen',
+      render: (mk: Matakuliah) => (
+        <div>
+          {mk.nama_dosen !== '-' ? (
+            <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100">
+              {mk.nama_dosen}
+            </span>
+          ) : (
+            <span className="text-gray-500">-</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      label: 'Prasyarat',
+      render: (mk: Matakuliah) => (
+        <div>
+          {mk.prasyarat !== '-' ? mk.prasyarat : <span className="text-gray-500">-</span>}
+        </div>
+      ),
     },
     {
       label: 'Aksi', // Edit & Hapus

@@ -4,6 +4,8 @@ use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\UserManagerCreateController;
+use App\Http\Controllers\DosenManagerController;
+use App\Http\Controllers\DosenManagerEditController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -58,8 +60,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('peserta');
 
         Route::get('soal', function () {
-            return Inertia::render('peserta');
+            return Inertia::render('dosen-manager');
         })->name('peserta');
+
+        Route::prefix('dosen')->name('dosen.')->group(function () {
+            Route::get('/', [DosenManagerController::class, 'index'])->name('manager');
+            Route::get('{id}/edit', [DosenManagerEditController::class, 'edit'])->name('edit');
+            Route::put('{id}', [DosenManagerEditController::class, 'update'])->name('update');
+            Route::delete('{user}', [DosenManagerController::class, 'delete'])->name('destroy');
+            Route::get('create', [DosenManagerEditController::class, 'create'])->name('create');
+            Route::post('/', [DosenManagerEditController::class, 'store'])->name('store');
+        });
+        
 
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
     });
@@ -78,6 +90,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
                 Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
             });
+
+
+            
 
 
             Route::get('roles', function () {

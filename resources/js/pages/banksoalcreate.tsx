@@ -80,7 +80,7 @@ interface SoalForm {
 }
 
 export default function BankSoalCreate() {
-    const { data, setData, post, processing } = useForm<SoalForm>({
+    const { data, setData, processing } = useForm<SoalForm>({
         kategori_soal: '',
         suara: 'tidak',
         footer_soal: '',

@@ -1,7 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Pencil, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { CAlertDialog } from '@/components/c-alert-dialog';
@@ -11,6 +10,7 @@ import { CustomTable } from '@/components/ui/c-table';
 import { EntriesSelector } from '@/components/ui/entries-selector';
 import { PaginationWrapper } from '@/components/ui/pagination-wrapper';
 import { SearchInputMenu } from '@/components/ui/search-input-menu';
+import { useState } from 'react';
 
 interface BreadcrumbItem {
     title: string;
@@ -61,9 +61,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Banksoal() {
     console.log("Raw props:", usePage().props);
     
-    // Gunakan pendekatan defensif untuk mendapatkan props
-    const props = usePage().props as any;
-    
+    const props = usePage().props as unknown as PageProps;
+
     // Verifikasi data sebelum mengaksesnya
     const dataSoal = props.dataSoal || { 
         data: [], 
@@ -74,7 +73,6 @@ export default function Banksoal() {
     };
     
     const filters = props.filters || { search: '' };
-    const flash = props.flash || {};
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

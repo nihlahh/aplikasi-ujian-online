@@ -1,5 +1,4 @@
-import { useForm } from '@inertiajs/react';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import AppLayout from '@/layouts/app-layout';
@@ -114,7 +113,7 @@ export default function BankSoalEdit() {
             jw_5: string;
             jw_fix: string;
         }
-        [key: string]: any;
+        [key: string]: unknown;
     }
     
     const { soal } = usePage<PageProps>().props;
@@ -163,7 +162,6 @@ export default function BankSoalEdit() {
         fetchBidangOptions();
     }, [soal]);    
 
-    // Perubahan 3: Perbarui handleSubmit untuk menggunakan axios langsung
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setProcessing(true);
@@ -230,22 +228,25 @@ export default function BankSoalEdit() {
             setTimeout(() => {
                 window.location.href = '/master-data/bank-soal';
             }, 1000);
-        } catch (error: any) {
-            console.error('Error during form submission:', error);
-            toast.error('Terjadi kesalahan saat memperbarui soal');
-    
-            // Tampilkan detail error
-            if (error.response?.data?.errors) {
-                const errorMessages = error.response.data.errors;
-                Object.keys(errorMessages).forEach(key => {
-                    toast.error(`${key}: ${errorMessages[key]}`);
-                });
-            }
-        } finally {
-            setProcessing(false);
-        }
-    };            
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                console.error('Error during form submission:', error);
+                toast.error('Terjadi kesalahan saat memperbarui soal');
 
+                if (error.response?.data?.errors) {
+                    const errorMessages = error.response.data.errors as Record<string, string>;
+                    Object.keys(errorMessages).forEach(key => {
+                        toast.error(`${key}: ${errorMessages[key]}`);
+                    });
+                }
+            } else {
+                console.error('Unexpected error:', error);
+                toast.error('Terjadi kesalahan tak terduga');
+            }
+        }
+
+        setProcessing(false);
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Soal" />
@@ -340,7 +341,7 @@ export default function BankSoalEdit() {
                         <InputField
                             key={key}
                             label={`Jawaban ${String.fromCharCode(65 + i)}`}
-                            value={data[key as keyof SoalForm] as string}
+                            value={(data[key] ?? '') as string}
                             onChange={(e) => handleChange(key as keyof SoalForm, e.target.value)}
                             textarea
                         />

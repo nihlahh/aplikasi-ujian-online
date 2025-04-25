@@ -63,7 +63,6 @@
         "query-string": "^9.1.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "react-draft-wysiwyg": "^1.15.0",
         "react-h5-audio-player": "^3.10.0-rc.1",
         "react-hook-form": "^7.55.0",
         "sonner": "^2.0.3",

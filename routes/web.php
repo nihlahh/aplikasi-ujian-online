@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\KategoriUjianController;
 use App\Http\Controllers\MatkulController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\UserManagerCreateController;
@@ -62,6 +64,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('peserta');
 
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
+
+        Route::prefix('kategori-ujian')->name('kategori-ujian.')->group(function () {
+            Route::get('/', [KategoriUjianController::class, 'index'])->name('manager');
+            Route::get('{id}/edit', [UserManagerEditController::class, 'edit'])->name('edit');
+            Route::put('{id}', [UserManagerEditController::class, 'update'])->name('update');
+            Route::delete('{user}', [UserManagerController::class, 'delete'])->name('destroy');
+            Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
+            Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
+        });
+
+        Route::prefix('test')->name('user.')->group(function () {
+            Route::get('/', [TestController::class, 'index'])->name('manager');
+            Route::get('{id}/edit', [UserManagerEditController::class, 'edit'])->name('edit');
+            Route::put('{id}', [UserManagerEditController::class, 'update'])->name('update');
+            Route::delete('{user}', [UserManagerController::class, 'delete'])->name('destroy');
+            Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
+            Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
+        });
     });
 
     Route::middleware(['role:super_admin'])->group(function () {

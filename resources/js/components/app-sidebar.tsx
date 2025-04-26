@@ -44,7 +44,7 @@ const items: MainNavItem[] = [
         subitem: [
             {
                 title: 'Peserta',
-                href: '/master-data/peserta',
+                href: '/master-data/test',
                 icon: UserRound,
             },
             {

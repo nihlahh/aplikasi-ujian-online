@@ -7,6 +7,12 @@ use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\JenisUjianController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\Matakuliah;
+
+// Custom route binding untuk Matakuliah model
+Route::bind('matakuliah', function ($value) {
+    return Matakuliah::where('id_mk', $value)->firstOrFail();
+});
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
@@ -32,8 +38,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('rekap-nilai', function () {
         return Inertia::render('peserta');
     })->name('peserta');
-
-
 
     // Buat route yang punya submenu, bisa dimasukkan ke dalam group
     // contohnya kek gini buat master-data
@@ -80,8 +84,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('bank.soal.create');
         
         Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
-        
-        Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
+                
+        // Route untuk matakuliah dipindahkan ke dalam grup master-data
+        Route::prefix('matakuliah')->name('matakuliah.')->group(function () {
+            Route::get('/', [MatkulController::class, 'index'])->name('index');
+            Route::get('/create', [MatkulController::class, 'create'])->name('create');
+            Route::post('/', [MatkulController::class, 'store'])->name('store');
+            Route::get('/{matakuliah}/edit', [MatkulController::class, 'edit'])->name('edit');
+            Route::put('/{matakuliah}', [MatkulController::class, 'update'])->name('update');
+            Route::delete('/{matakuliah}', [MatkulController::class, 'destroy'])->name('destroy');
+        });
     });
 
     Route::middleware(['role:super_admin'])->group(function () {
@@ -98,7 +110,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
                 Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
             });
-
 
             Route::get('roles', function () {
                 return Inertia::render('user-management/role-manager');

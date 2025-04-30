@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\User;
+use App\Models\soal;
 
 class KategoriUjianController extends Controller
 {
@@ -13,7 +13,7 @@ class KategoriUjianController extends Controller
         $pages = $request->query('pages', 10);
         $search = $request->query('search', null);
 
-        $usersQuery = User::with('roles');
+        $usersQuery = soal::with('roles');
         if ($search) {
             $usersQuery->where('name', 'like', '%' . $search . '%')
                 ->orWhere('email', 'like', '%' . $search . '%');
@@ -31,7 +31,7 @@ class KategoriUjianController extends Controller
         );
     }
 
-    public function delete(Request $request, User $user)
+    public function delete(Request $request, soal $user)
     {
         if ($request->user()->id === $user->id) {
             return redirect()->back()->with('error', 'You cannot delete your own account');
@@ -42,7 +42,7 @@ class KategoriUjianController extends Controller
         return redirect()->back()->with('success', 'User deleted successfully');
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, soal $user)
     {
         $user->update($request->all());
 

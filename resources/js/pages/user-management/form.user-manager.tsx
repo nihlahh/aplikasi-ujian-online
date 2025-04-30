@@ -32,10 +32,11 @@ const formSchema = z.object({
         .optional()
         .refine((val) => !val || val.length >= 8, { message: 'Password must be at least 8 characters.' }),
     roles: z.array(z.string()).nonempty('Please select at least one item'),
+    kategoriUjian: z.array(z.string()).nonempty('Please select at least one item'),
 });
 
 export default function Dashboard() {
-    const { user, allRoles } = usePage<{ user: UserWithPassword; allRoles: Role[] }>().props;
+    const { user, allRoles, allCategories } = usePage<{ user: UserWithPassword; allRoles: Role[]; allCategories: { id: string; name: string }[] }>().props;
     const isEdit = !!user;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -56,6 +57,7 @@ export default function Dashboard() {
             email: user?.email ?? '',
             password: '',
             roles: user?.roles?.length ? user.roles : [],
+            kategoriUjian: [],
         },
     });
 
@@ -68,6 +70,7 @@ export default function Dashboard() {
                     name: values.username,
                     email: values.email,
                     roles: values.roles,
+                    kategoriUjian: values.kategoriUjian,
                 },
                 {
                     preserveScroll: true,
@@ -90,6 +93,7 @@ export default function Dashboard() {
                     email: values.email,
                     password: values.password,
                     roles: values.roles,
+                    kategoriUjian: values.kategoriUjian,
                 },
                 {
                     preserveScroll: true,
@@ -116,7 +120,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="space-between flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">{isEdit ? 'Edit' : 'Create'} User</h1>
+                    <h1 className="text-2xl font-bold">{isEdit ? 'Edit' : ''} Tambah Judul Soal</h1>
                     <CButton type="primary" className="md:w-24" onClick={() => router.visit(route('user-management.user.manager'))}>
                         Back
                     </CButton>
@@ -125,12 +129,38 @@ export default function Dashboard() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <FormField
                             control={form.control}
+                            name="kategoriUjian"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Kategori Ujian</FormLabel>
+                                    <FormControl>
+                                        <MultiSelector values={field.value} onValuesChange={field.onChange} loop className="max-w-xs">
+                                            <MultiSelectorTrigger>
+                                                <MultiSelectorInput placeholder="Pilih Kategori Ujian" />
+                                            </MultiSelectorTrigger>
+                                            <MultiSelectorContent>
+                                                <MultiSelectorList>
+                                                    {allCategories.map((category) => (
+                                                        <MultiSelectorItem key={category.id} value={category.name}>
+                                                            {category.name}
+                                                        </MultiSelectorItem>
+                                                    ))}
+                                                </MultiSelectorList>
+                                            </MultiSelectorContent>
+                                        </MultiSelector>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
                             name="username"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Username</FormLabel>
+                                    <FormLabel>Kategori Ujian</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Enter your username" {...field} />
+                                        <Input placeholder="Pilih Kategori Ujian" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

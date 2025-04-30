@@ -23,9 +23,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface User {
     id: number;
-    name: string;
+    nama: string;
     email: string;
-    roles: { name: string }[];
+    roles: { nama: string }[];
 }
 
 export default function UserManager() {
@@ -94,12 +94,14 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
         {
             label: 'No',
             className: 'w-[100px] text-center',
-            render: (user: User) => <div className="text-center font-medium">{user.id}</div>,
+            render: (row: User) => (
+                <div className="text-center font-medium">{(userData.current_page - 1) * userData.per_page + userData.data.indexOf(row) + 1}</div>
+            ),
         },
         {
             label: 'Paket Soal',
             className: 'w-[800px] text-center',
-            render: (user: User) => user.name,
+            render: (user: User) => user.nama,
         },
         {
             label: 'Total Soal',
@@ -111,7 +113,7 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             className: 'w-[100px] text-center',
             render: (user: User) => (
                 <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={List} type='primary' onClick={() => router.visit(route('user-management.user.show', user.id))} className="bg-yellow-500" />
+                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('user-management.user.show', user.id))} className="bg-yellow-500" />
                     <CButtonIcon icon={Pencil} onClick={() => router.visit(route('user-management.user.edit', user.id))} />
                     <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
                 </div>

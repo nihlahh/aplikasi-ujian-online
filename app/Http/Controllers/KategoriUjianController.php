@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\soal;
+use App\Models\bidang;
 
 class KategoriUjianController extends Controller
 {
@@ -13,9 +14,9 @@ class KategoriUjianController extends Controller
         $pages = $request->query('pages', 10);
         $search = $request->query('search', null);
 
-        $usersQuery = soal::with('roles');
+        $usersQuery = bidang::query();
         if ($search) {
-            $usersQuery->where('name', 'like', '%' . $search . '%')
+            $usersQuery->where('nama', 'like', '%' . $search . '%')
                 ->orWhere('email', 'like', '%' . $search . '%');
         }
 
@@ -31,7 +32,7 @@ class KategoriUjianController extends Controller
         );
     }
 
-    public function delete(Request $request, soal $user)
+    public function delete(Request $request, bidang $user)
     {
         if ($request->user()->id === $user->id) {
             return redirect()->back()->with('error', 'You cannot delete your own account');
@@ -42,7 +43,7 @@ class KategoriUjianController extends Controller
         return redirect()->back()->with('success', 'User deleted successfully');
     }
 
-    public function update(Request $request, soal $user)
+    public function update(Request $request, bidang $user)
     {
         $user->update($request->all());
 

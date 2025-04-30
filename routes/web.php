@@ -37,16 +37,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-
-    Route::prefix('examschedule')->name('examschedule.')->group(function () {
-        Route::get('/', [ExamScheduleController::class, 'index'])->name('index');
-        Route::get('/create', [ExamScheduleController::class, 'create'])->name('create');
-        Route::post('/', [ExamScheduleController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [ExamScheduleController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [ExamScheduleController::class, 'update'])->name('update');
-        Route::delete('/{id}', [ExamScheduleController::class, 'destroy'])->name('destroy');
-    });
-
     Route::get('monitoring-ujian', function () {
         return Inertia::render('peserta');
     })->name('monitoring.ujian');

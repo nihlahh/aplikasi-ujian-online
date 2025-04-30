@@ -5,12 +5,22 @@ use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\JenisUjianController;
+use App\Http\Controllers\ExamScheduleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home');
+
+Route::prefix('jadwal-ujian')->name('exam-schedule.')->group(function () {
+    Route::get('/', [ExamScheduleController::class, 'index'])->name('index');
+    Route::get('/create', [ExamScheduleController::class, 'create'])->name('create');
+    Route::post('/', [ExamScheduleController::class, 'store'])->name('store');
+    Route::get('/{examSchedule}/edit', [ExamScheduleController::class, 'edit'])->name('edit');
+    Route::put('/{examSchedule}', [ExamScheduleController::class, 'update'])->name('update');
+    Route::delete('/{examSchedule}', [ExamScheduleController::class, 'destroy'])->name('destroy');
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // yang perlu diinget, buat name yang punya nama lebih dari 1 kata, contohnya monitoring-ujian
@@ -21,9 +31,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('jadwal-ujian', function () {
-        return Inertia::render('peserta');
-    })->name('peserta');
+
+    Route::prefix('examschedule')->name('examschedule.')->group(function () {
+        Route::get('/', [ExamScheduleController::class, 'index'])->name('index');
+        Route::get('/create', [ExamScheduleController::class, 'create'])->name('create');
+        Route::post('/', [ExamScheduleController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ExamScheduleController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ExamScheduleController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ExamScheduleController::class, 'destroy'])->name('destroy');
+    });
 
     Route::get('monitoring-ujian', function () {
         return Inertia::render('peserta');
@@ -78,9 +94,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('bank-soal/create', function () {
             return Inertia::render('banksoalcreate');
         })->name('bank.soal.create');
-        
+
         Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
-        
+
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
     });
 

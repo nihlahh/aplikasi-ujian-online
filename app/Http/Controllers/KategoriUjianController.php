@@ -32,7 +32,7 @@ class KategoriUjianController extends Controller
         );
     }
 
-    public function delete(Request $request, soal $user)
+    public function delete(Request $request, bidang $user)
     {
         if ($request->user()->id === $user->id) {
             return redirect()->back()->with('error', 'You cannot delete your own account');
@@ -43,7 +43,7 @@ class KategoriUjianController extends Controller
         return redirect()->back()->with('success', 'User deleted successfully');
     }
 
-    public function update(Request $request, soal $user)
+    public function update(Request $request, bidang $user)
     {
         $user->update($request->all());
 

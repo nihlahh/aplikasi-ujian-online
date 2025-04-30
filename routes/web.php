@@ -19,15 +19,6 @@ Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home');
 
-Route::prefix('jadwal-ujian')->name('exam-schedule.')->group(function () {
-    Route::get('/', [ExamScheduleController::class, 'index'])->name('index');
-    Route::get('/create', [ExamScheduleController::class, 'create'])->name('create');
-    Route::post('/', [ExamScheduleController::class, 'store'])->name('store');
-    Route::get('/{examSchedule}/edit', [ExamScheduleController::class, 'edit'])->name('edit');
-    Route::put('/{examSchedule}', [ExamScheduleController::class, 'update'])->name('update');
-    Route::delete('/{examSchedule}', [ExamScheduleController::class, 'destroy'])->name('destroy');
-});
-
 Route::middleware(['auth', 'verified'])->group(function () {
     // yang perlu diinget, buat name yang punya nama lebih dari 1 kata, contohnya monitoring-ujian
     // itu harus diubah jadi pake titik, contoh monitoring.ujian
@@ -40,6 +31,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('monitoring-ujian', function () {
         return Inertia::render('peserta');
     })->name('monitoring.ujian');
+
+    Route::prefix('jadwal-ujian')->name('exam-schedule.')->group(function () {
+        Route::get('/', [ExamScheduleController::class, 'index'])->name('index');
+        Route::get('/create', [ExamScheduleController::class, 'create'])->name('create');
+        Route::post('/', [ExamScheduleController::class, 'store'])->name('store');
+        Route::get('/{examSchedule}/edit', [ExamScheduleController::class, 'edit'])->name('edit');
+        Route::put('/{examSchedule}', [ExamScheduleController::class, 'update'])->name('update');
+        Route::delete('/{examSchedule}', [ExamScheduleController::class, 'destroy'])->name('destroy');
+    });
 
     Route::get('rekap-nilai', function () {
         return Inertia::render('peserta');

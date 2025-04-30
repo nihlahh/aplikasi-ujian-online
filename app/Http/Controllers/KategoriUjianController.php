@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\soal;
+use App\Models\bidang;
 
 class KategoriUjianController extends Controller
 {
@@ -13,9 +14,9 @@ class KategoriUjianController extends Controller
         $pages = $request->query('pages', 10);
         $search = $request->query('search', null);
 
-        $usersQuery = soal::with('roles');
+        $usersQuery = bidang::query();
         if ($search) {
-            $usersQuery->where('name', 'like', '%' . $search . '%')
+            $usersQuery->where('nama', 'like', '%' . $search . '%')
                 ->orWhere('email', 'like', '%' . $search . '%');
         }
 

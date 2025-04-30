@@ -23,9 +23,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface User {
     id: number;
-    name: string;
+    nama: string;
     email: string;
-    roles: { name: string }[];
+    roles: { nam: string }[];
 }
 
 export default function UserManager() {

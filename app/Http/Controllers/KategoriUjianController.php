@@ -34,7 +34,7 @@ class KategoriUjianController extends Controller
 
     public function delete(Request $request, bidang $user)
     {
-        if ($request->user()->id === $user->id) {
+        if ($request->user()->kode === $user->kode) {
             return redirect()->back()->with('error', 'You cannot delete your own account');
         }
 

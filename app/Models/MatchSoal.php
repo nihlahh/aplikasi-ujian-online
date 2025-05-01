@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MatchSoal extends Model
 {
-    
+    protected $connection = 'data_db';
     protected $primaryKey = 'id';
     public $timestamps = false;
     protected $fillable = [

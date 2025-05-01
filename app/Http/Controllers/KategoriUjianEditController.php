@@ -12,33 +12,41 @@ class KategoriUjianEditController extends Controller
 {
     public function edit($id)
     {
+        if (!is_numeric($id)) {
+            return redirect()->back()->with('error', 'ID tidak valid.');
+        }
+        if(Bidang::where('kode', $id)->count() == 0) {
+            return redirect()->back()->with('error', 'Bidang tidak ditemukan.');
+        }
+
         $bidang = Bidang::with('match_soal')->findOrFail($id);
 
         return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
-            'bidang' => $bidang,
-            'soalList' => Soal::all(),
-            'selectedSoal' => $bidang->match_soal->pluck('soal_id'),
-            'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
-            'typeOptions' => Bidang::select('type')->distinct()->pluck('type'),
+            'bidang' => $bidang, 
+            'soalList' => Soal::all(), 
+            'selectedSoal' => $bidang->match_soal->pluck('soal_id'), 
+            'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(), 
+            'typeOptions' => Bidang::select('type')->distinct()->pluck('type'), 
         ]);
     }
 
     public function update(Request $request, $id)
     {
-        $bidang = Bidang::findOrFail($id);
+        $bidang = Bidang::findOrFail($id); 
+
+        if ($bidang->kode != $id) {
+            return redirect()->back()->with('error', 'Bidang tidak ditemukan.');
+        }
 
         $data = $request->validate([
             'nama' => 'required|string',
-            'paket' => 'required|string',
             'type' => 'nullable|string',
             'match_soal' => 'nullable|array',
             'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);
 
         $bidang->update([
-            'kode' => $bidang->kode, // Kode tidak perlu diupdate
             'nama' => $data['nama'],
-            // 'paket' => $data['paket'],
             'type' => $data['type'] ?? $bidang->type,
         ]);
 
@@ -46,14 +54,16 @@ class KategoriUjianEditController extends Controller
         MatchSoal::where('bidang_id', $bidang->kode)->delete();
 
         // Simpan ulang semua soal terhubung
-        foreach ($data['match_soal'] as $item) {
-            MatchSoal::create([
-                'soal_id' => $item['soal_id'],
-                'bidang_id' => $bidang->kode,
-            ]);
+        if (isset($data['match_soal'])) {
+            foreach ($data['match_soal'] as $item) {
+                MatchSoal::create([
+                    'soal_id' => $item['soal_id'],
+                    'bidang_id' => $bidang->kode,
+                ]);
+            }
         }
 
-        return redirect()->route('master-data.kategori-soal.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
+        return redirect()->route('master-data.kategori-ujian.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
     }
 
     public function create()

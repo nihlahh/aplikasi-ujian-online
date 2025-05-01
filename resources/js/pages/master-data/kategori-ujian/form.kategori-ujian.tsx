@@ -10,16 +10,13 @@ import { CButton } from '@/components/ui/c-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, User } from '@/types';
+import { type BreadcrumbItem, } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-interface UserWithPassword extends User {
-    password: string;
-}
 
 const formSchema = z.object({
     nama: z.string().min(2, {
@@ -33,12 +30,12 @@ const formSchema = z.object({
 });
 
 export default function Dashboard() {
-    const { user, typeOptions = [] } = usePage<{
-        user: UserWithPassword;
-        allCategories: { id: string; name: string }[];
+    const { bidang, typeOptions = [] } = usePage<{
+        bidang?: { kode: number; nama: string; type: string };
+        allCategories: { kode: string; name: string }[];
         typeOptions: string[]; // Explicitly type typeOptions as an array of strings
     }>().props;
-    const isEdit = !!user;
+    const isEdit = !!bidang;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -54,9 +51,8 @@ export default function Dashboard() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            nama: typeof user?.nama === 'string' ? user.nama : '',
-            type: typeof user?.type === 'string' ? user.type : '', // Ambil type dari user jika ada
-            newType: '', // Tambahkan field untuk type baru
+            nama: bidang?.nama ?? '',
+            type: bidang?.type ?? '',
         },
     });
 
@@ -64,7 +60,7 @@ export default function Dashboard() {
         const typeToSubmit = values.newType ? values.newType : values.type; // Gunakan type baru jika diisi
         if (isEdit) {
             router.put(
-                route('master-data.kategori-ujian.update', user.id),
+                route('master-data.kategori-ujian.update', bidang.kode), // Gunakan ID terkait
                 {
                     nama: values.nama,
                     type: typeToSubmit,

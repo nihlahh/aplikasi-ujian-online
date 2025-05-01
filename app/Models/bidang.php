@@ -8,15 +8,10 @@ class Bidang extends Model
 {
     protected $connection = 'data_db';
     protected $table = 'm_bidang';
-    protected $primaryKey = 'kode';
     public $timestamps = false;
+
     protected $fillable = [
         'nama',
-        'type',
-        
+        'type', // Tambahkan type di sini
     ];
-    public function match_soal()
-    {
-        return $this->hasMany(MatchSoal::class, 'bidang_id', 'kode');
-    }
 }

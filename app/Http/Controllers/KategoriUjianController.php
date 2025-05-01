@@ -4,20 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\soal;
+use App\Models\MatchSoal;
 use App\Models\bidang;
 
 class KategoriUjianController extends Controller
 {
-    function index(Request $request)
+    public function index(Request $request)
     {
         $pages = $request->query('pages', 10);
         $search = $request->query('search', null);
 
-        $usersQuery = bidang::query();
+        $usersQuery = bidang::withCount('match_soal'); 
         if ($search) {
-            $usersQuery->where('nama', 'like', '%' . $search . '%')
-                ->orWhere('email', 'like', '%' . $search . '%');
+            $usersQuery->where('nama', 'like', '%' . $search . '%');
         }
 
         return Inertia::render(
@@ -33,11 +32,10 @@ class KategoriUjianController extends Controller
     }
 
     public function delete(Bidang $bidang)
-{
-    $bidang->delete();
-    return redirect()->back()->with('success', 'Data bidang berhasil dihapus');
-}
-
+    {
+        $bidang->delete();
+        return redirect()->back()->with('success', 'Data bidang berhasil dihapus');
+    }
 
     public function update(Request $request, bidang $user)
     {

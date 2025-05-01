@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class soal extends Model
+class Soal extends Model
 {
     protected $connection = 'data_db';
     protected $table = 'm_soal';
@@ -13,8 +13,6 @@ class soal extends Model
     protected $fillable = [
         'kategori_soal',
         'paket',
-
-        
     ];
     public function match_soal()
     {

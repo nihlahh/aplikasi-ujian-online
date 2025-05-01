@@ -16,7 +16,7 @@ import { SearchInputMenu } from '@/components/ui/search-input-menu';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'User Manager',
+        title: 'Kategori Ujian',
         href: '/master-data/kategori-ujian',
     },
 ];
@@ -105,9 +105,15 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             render: (user: User) => user.nama,
         },
         {
-            label: 'Total Soal',
+            label: 'Total Soal', // Tambahkan kolom baru
             className: 'w-[200px] text-center',
-            render: (user: User) => <div className="text-center font-medium">{user.email}</div>,
+            render: (user: User) => (
+                <div className="text-center font-medium">
+                    {Array.isArray(user.match_soal_count)
+                        ? user.match_soal_count.map(item => item.nam).join(', ')
+                        : user.match_soal_count}
+                </div>
+        ),
         },
         {
             label: 'Action',

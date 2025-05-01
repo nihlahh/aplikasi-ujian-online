@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('match_soals', function (Blueprint $table) {
+        Schema::connection('data_db')->create('match_soals', function (Blueprint $table) {
             $table->id();
             $table->integer('soal_id')->nullable();
             $table->integer('bidang_id')->nullable();

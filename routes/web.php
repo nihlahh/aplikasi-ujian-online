@@ -83,7 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [KategoriUjianController::class, 'index'])->name('manager');
             Route::get('{id}/edit', [KategoriUjianEditController::class, 'edit'])->name('edit');
             Route::put('{id}', [KategoriUjianEditController::class, 'update'])->name('update');
-            Route::delete('/{bidang}', [KategoriUjianController::class, 'delete'])->name('.destroy');
+            Route::delete('/{bidang}', [KategoriUjianController::class, 'delete'])->name('destroy');
 
             Route::get('create', [KategoriUjianEditController::class, 'create'])->name('create');
             Route::post('/', [KategoriUjianEditController::class, 'store'])->name('store');

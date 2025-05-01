@@ -42,10 +42,10 @@ export default function UserManager() {
             <Head title="Data Paket Soal" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <ContentTitle title="Data Paket Soal" showButton onButtonClick={() => router.visit(route('user-management.user.create'))} />
+                <ContentTitle title="Data Paket Soal" showButton onButtonClick={() => router.visit(route('master-data.kategori-ujian.create'))} />
                 <div className="mt-4 flex items-center justify-between">
-                    <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="user-management.user.manager" />
-                    <SearchInputMenu defaultValue={filters.search} routeName="user-management.user.manager" />
+                    <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="master-data.kategori-ujian.manager" />
+                    <SearchInputMenu defaultValue={filters.search} routeName="master-data.kategori-ujian.manager" />
                 </div>
                 <UserTable data={userData} pageFilters={filters} />
             </div>
@@ -81,7 +81,7 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
 
     // Helper function to navigate with preserved search parameters
     const navigateToPage = (page: number) => {
-        router.visit(route('user-management.user.manager'), {
+        router.visit(route('master-data.kategori-ujian.manager'), {
             data: {
                 page: page,
                 search: filters.search,
@@ -120,8 +120,8 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             className: 'w-[100px] text-center',
             render: (user: User) => (
                 <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('user-management.user.show', user.kode))} className="bg-yellow-500" />
-                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('user-management.user.edit', user.kode))} />
+                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', user.kode))} className="bg-yellow-500" />
+                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', user.kode))} />
                     <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.kode)} />
                 </div>
             ),

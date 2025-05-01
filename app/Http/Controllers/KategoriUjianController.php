@@ -33,7 +33,11 @@ class KategoriUjianController extends Controller
 
     public function delete(Bidang $bidang)
     {
-        
+        $bidang=bidang::findOrFail($bidang->kode);
+        $bidang->match_soal()->delete(); // Delete related match_soal records
+        $bidang->delete();
+
+        return redirect()->back()->with('success', 'Bidang deleted successfully');
     }
 
     public function update(Request $request, bidang $user)

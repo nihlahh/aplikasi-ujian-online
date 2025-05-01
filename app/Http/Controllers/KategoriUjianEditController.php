@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Bidang;
-use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
 use App\Models\MatchSoal;
 use App\Models\Soal;
+use Inertia\Inertia;
 
 class KategoriUjianEditController extends Controller
 {
@@ -17,71 +16,77 @@ class KategoriUjianEditController extends Controller
 
         return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
             'bidang' => $bidang,
-            'soalList' => Soal::all(), // Ambil semua soal untuk dropdown
-            'selectedSoal' => $bidang->match_soal->pluck('soal_id'), // Soal yang sudah dipilih
+            'soalList' => Soal::all(),
+            'selectedSoal' => $bidang->match_soal->pluck('soal_id'),
+            'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
+            'typeOptions' => Bidang::select('type')->distinct()->pluck('type'),
         ]);
     }
 
     public function update(Request $request, $id)
     {
-        $data = $request->validate([
-            'nama' => 'required|string',
-            'type' => 'required|string',
-            'match_soal' => 'required|array',
-            'match_soal.*' => 'required|integer|exists:m_soal,ids',
-        ]);
-
         $bidang = Bidang::findOrFail($id);
-        $bidang->update([
-            'nama' => $data['nama'],
-            'type' => $data['type'],
+
+        $data = $request->validate([
+            'kategori_soal' => 'required|string',
+            'paket' => 'required|string',
+            'type' => 'nullable|string',
+            'match_soal' => 'required|array',
+            'match_soal.*.soal_id' => 'required|integer|exists:m_soal,ids',
         ]);
 
-        // Hapus match soal lama
-        $bidang->match_soal()->delete();
+        $bidang->update([
+            'nama' => $data['kategori_soal'],
+            'paket' => $data['paket'],
+            'type' => $data['type'] ?? $bidang->type,
+        ]);
 
-        // Tambahkan match soal baru
-        foreach ($data['match_soal'] as $soalId) {
+        // Hapus match sebelumnya
+        MatchSoal::where('bidang_id', $bidang->kode)->delete();
+
+        // Simpan ulang semua soal terhubung
+        foreach ($data['match_soal'] as $item) {
             MatchSoal::create([
-                'soal_id' => $soalId,
+                'soal_id' => $item['soal_id'],
                 'bidang_id' => $bidang->kode,
             ]);
         }
 
-        return redirect()->route('master-data.kategori-ujian.index')->with('success', 'Bidang updated successfully');
+        return redirect()->route('user-management.user.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
     }
 
     public function create()
     {
-        $allRoles = Role::all();
-
         return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
-            'user' => null,
-            'allRoles' => $allRoles
+            'bidang' => null,
+            'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
+            'typeOptions' => Bidang::select('type')->distinct()->pluck('type'),
         ]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama' => 'required|string',
-            'type' => 'required|string',
+            'kategori_soal' => 'required|string',
+            'paket' => 'required|string',
+            'type' => 'nullable|string',
             'match_soal' => 'required|array',
-            'match_soal.*' => 'required|integer|exists:m_soal,ids',
+            'match_soal.*.soal_id' => 'required|integer|exists:m_soal,ids',
         ]);
 
         $bidang = Bidang::create([
-            'nama' => $data['nama'],
-            'type' => $data['type'],
+            'nama' => $data['kategori_soal'],
+            'paket' => $data['paket'],
+            'type' => $data['type'] ?? null,
         ]);
 
-        foreach ($data['match_soal'] as $soalId) {
+        foreach ($data['match_soal'] as $item) {
             MatchSoal::create([
-                'soal_id' => $soalId,
+                'soal_id' => $item['soal_id'],
                 'bidang_id' => $bidang->kode,
             ]);
         }
 
-        return redirect()->route('master-data.kategori-ujian.index')->with('success', 'Bidang created successfully');
+        return redirect()->route('user-management.user.manager')->with('success', 'Kategori ujian berhasil ditambahkan.');
     }
 }

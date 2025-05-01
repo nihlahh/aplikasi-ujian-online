@@ -1,5 +1,14 @@
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from '@/components/ui/select';
+  
 import { CButton } from '@/components/ui/c-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,24 +18,26 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 interface UserWithPassword extends User {
-    nama: string; // Ensure nama is explicitly typed as string
     password: string;
-    kategoriUjian: string; // Ensure kategoriUjian is explicitly typed as string
-    type: string; // Ensure type is explicitly typed as string
 }
 
 const formSchema = z.object({
     nama: z.string().min(2, {
-        message: 'Nama harus memiliki minimal 2 karakter.',
+        message: 'Inputkan nama kategori ujian',
     }),
-    type: z.string().min(1, {
-        message: 'Type harus diisi.',
-    }),
-    kategoriUjian: z.string().nonempty('Pilih kategori ujian.'), // Ubah menjadi string
+    type: z.string().optional(), // Type dari dropdown
+    newType: z.string().optional(), // Type baru
+}).refine((data) => data.type || data.newType, {
+    message: 'Pilih type atau masukkan type baru',
+    path: ['type'], // Error akan ditampilkan di field type
 });
 
 export default function Dashboard() {
-    const { user, allCategories } = usePage<{ user: UserWithPassword; allCategories: { id: string; name: string }[] }>().props;
+    const { user, typeOptions = [] } = usePage<{
+        user: UserWithPassword;
+        allCategories: { id: string; name: string }[];
+        typeOptions: string[]; // Explicitly type typeOptions as an array of strings
+    }>().props;
     const isEdit = !!user;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -40,66 +51,50 @@ export default function Dashboard() {
         },
     ];
 
-    const form = useForm<{
-        nama: string;
-        type: string;
-        kategoriUjian: string;
-    }, undefined, {
-        nama: string;
-        type: string;
-        kategoriUjian: string;
-    }>({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            nama: user?.nama || '',
-            type: user?.type || '',
-            kategoriUjian: user?.kategoriUjian || '', // Pastikan nilai default diatur
+            nama: typeof user?.nama === 'string' ? user.nama : '',
+            type: typeof user?.type === 'string' ? user.type : '', // Ambil type dari user jika ada
+            newType: '', // Tambahkan field untuk type baru
         },
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
+        const typeToSubmit = values.newType ? values.newType : values.type; // Gunakan type baru jika diisi
         if (isEdit) {
             router.put(
                 route('master-data.kategori-ujian.update', user.id),
                 {
                     nama: values.nama,
-                    type: values.type,
-                    kategoriUjian: values.kategoriUjian, // Kirim kategori ujian sebagai string
+                    type: typeToSubmit,
                 },
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        toast.success('Bidang berhasil diperbarui!');
+                        toast.success('Kategori ujian berhasil diperbarui!');
                     },
                     onError: (errors) => {
                         console.error('Error:', errors);
-                        if (errors.kategoriUjian) {
-                            toast.error(errors.kategoriUjian);
-                        }
                     },
-                },
+                }
             );
         } else {
             router.post(
                 route('master-data.kategori-ujian.store'),
                 {
                     nama: values.nama,
-                    type: values.type,
-                    kategoriUjian: values.kategoriUjian, // Kirim kategori ujian sebagai string
+                    type: typeToSubmit,
                 },
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        toast.success('Bidang berhasil dibuat!');
+                        toast.success('Kategori ujian berhasil ditambahkan!');
                     },
                     onError: (errors) => {
                         console.error('Error:', errors);
-                        if (errors.kategoriUjian) {
-                            toast.error(errors.kategoriUjian);
-                        }
                     },
-                },
+                }
             );
         }
     }
@@ -109,7 +104,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="space-between flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">{isEdit ? 'Edit' : ''} Tambah Judul Soal</h1>
+                    <h1 className="text-2xl font-bold">{isEdit ? 'Edit' : 'Create'} User</h1>
                     <CButton type="primary" className="md:w-24" onClick={() => router.visit(route('master-data.kategori-ujian.manager'))}>
                         Back
                     </CButton>
@@ -118,25 +113,49 @@ export default function Dashboard() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <FormField
                             control={form.control}
-                            name="kategoriUjian"
+                            name="nama"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nama paket pjian</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter your username" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="type"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Kategori Ujian</FormLabel>
                                     <FormControl>
-                                        <select
-                                            {...field}
-                                            className="form-select max-w-xs"
-                                            defaultValue=""
-                                        >
-                                            <option value="" disabled>
-                                                Pilih Kategori Ujian
-                                            </option>
-                                            {allCategories.map((category) => (
-                                                <option key={category.id} value={category.id}>
-                                                    {category.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Pilih atau ketik type ujian" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {typeOptions.map((type: string) => (
+                                                    <SelectItem key={type} value={type}>
+                                                        {type}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="nama"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Pilih Soal</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Pilih Soal" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

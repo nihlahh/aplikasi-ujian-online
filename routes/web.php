@@ -8,6 +8,7 @@ use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\ExamScheduleController;
+use App\Http\Controllers\KategoriUjianEditController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Matakuliah;
@@ -80,12 +81,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::prefix('kategori-ujian')->name('kategori-ujian.')->group(function () {
             Route::get('/', [KategoriUjianController::class, 'index'])->name('manager');
-            Route::get('{id}/edit', [UserManagerEditController::class, 'edit'])->name('edit');
-            Route::put('{id}', [UserManagerEditController::class, 'update'])->name('update');
-            Route::delete('/master-data/kategori-ujian/{bidang}', [KategoriUjianController::class, 'delete'])->name('kategori-ujian.destroy');
+            Route::get('{id}/edit', [KategoriUjianEditController::class, 'edit'])->name('edit');
+            Route::put('{id}', [KategoriUjianEditController::class, 'update'])->name('update');
+            Route::delete('/{bidang}', [KategoriUjianController::class, 'delete'])->name('.destroy');
 
-            Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
-            Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
+            Route::get('create', [KategoriUjianEditController::class, 'create'])->name('create');
+            Route::post('/', [KategoriUjianEditController::class, 'store'])->name('store');
         });
 
         Route::prefix('test')->name('user.')->group(function () {

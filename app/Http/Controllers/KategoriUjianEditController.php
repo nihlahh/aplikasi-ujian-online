@@ -32,7 +32,7 @@ class KategoriUjianEditController extends Controller
             ];
         });
 
-        return Inertia::render('user-management/form.kategori-ujian', [
+        return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
             'user' => $bidang,
             'match_soal' => $bidang->match_soal,
             'allRoles' => Role::all(),
@@ -70,7 +70,7 @@ class KategoriUjianEditController extends Controller
     {
         $allRoles = Role::all();
 
-        return Inertia::render('user-management/form.-manager', [
+        return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
             'user' => null,
             'allRoles' => $allRoles
         ]);
@@ -79,22 +79,21 @@ class KategoriUjianEditController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
-            'roles' => 'nullable|array',
-            'roles.*' => 'string|exists:roles,name',
+            'kategori_soal' => 'required|string',
+            'paket' => 'required|string',
+            'match_soal' => 'required|array',
+            'match_soal.*.soal_id' => 'required|integer|exists:m_soal,ids',
         ]);
 
-        $user = Bidang::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+        $bidang = Bidang::create([
+            'nama' => $data['kategori_soal'],
+            'paket' => $data['paket'],
         ]);
 
-        if (isset($data['roles'])) {
-            $user->syncRoles($data['roles']);
-        }
+        $match_soal = MatchSoal::create([
+            'soal_id' => $data['match_soal'][0]['soal_id'],
+            'bidang_id' => $bidang->kode,
+        ]);
 
         return redirect()->route('user-management.user.manager')->with('success', 'User created successfully');
     }

@@ -41,8 +41,8 @@ export default function Dashboard() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'User Manager',
-            href: '/user-management/user',
+            title: 'Kategori Ujian',
+            href: '/master-data/kategori-ujian',
         },
         {
             title: isEdit ? 'Edit' : 'Create',

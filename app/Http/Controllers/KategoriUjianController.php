@@ -20,7 +20,7 @@ class KategoriUjianController extends Controller
         }
 
         return Inertia::render(
-            'user-management/kategori-ujian',
+            'master-data/kategori-ujian/kategori-ujian',
             [
                 'data' => $usersQuery->paginate((int)$pages)->withQueryString(),
                 'filters' => [
@@ -33,8 +33,7 @@ class KategoriUjianController extends Controller
 
     public function delete(Bidang $bidang)
     {
-        $bidang->delete();
-        return redirect()->back()->with('success', 'Data bidang berhasil dihapus');
+        
     }
 
     public function update(Request $request, bidang $user)

@@ -13,57 +13,42 @@ class KategoriUjianEditController extends Controller
 {
     public function edit($id)
     {
-        $user = Bidang::findOrFail($id);
-        $bidang = Bidang::where('kode', $user->kode)->first();
-        $match_soal = $bidang->match_soal()->get();
-        $match_soal = $match_soal->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'soal_id' => $item->soal_id,
-                'bidang_id' => $item->bidang_id,
-            ];
-        });
-        $bidang->match_soal = $match_soal;
-        $bidang->match_soal = $bidang->match_soal->map(function ($item) {
-            return [
-                'id' => $item['id'],
-                'soal_id' => $item['soal_id'],
-                'bidang_id' => $item['bidang_id'],
-            ];
-        });
+        $bidang = Bidang::with('match_soal')->findOrFail($id);
 
         return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
-            'user' => $bidang,
-            'match_soal' => $bidang->match_soal,
-            'allRoles' => Role::all(),
-            'bidang' => Bidang::all(),
+            'bidang' => $bidang,
+            'soalList' => Soal::all(), // Ambil semua soal untuk dropdown
+            'selectedSoal' => $bidang->match_soal->pluck('soal_id'), // Soal yang sudah dipilih
         ]);
     }
 
-
     public function update(Request $request, $id)
     {
-        $bidang = Bidang::findOrFail($id);
-
         $data = $request->validate([
-            'kategori_soal' => 'required|string',
-            'paket' => 'required|string',
+            'nama' => 'required|string',
+            'type' => 'required|string',
             'match_soal' => 'required|array',
-            'match_soal.*.soal_id' => 'required|integer|exists:m_soal,ids',
+            'match_soal.*' => 'required|integer|exists:m_soal,ids',
         ]);
 
+        $bidang = Bidang::findOrFail($id);
         $bidang->update([
-            'kategori_soal' => $data['kategori_soal'],
-            'paket' => $data['paket'],
+            'nama' => $data['nama'],
+            'type' => $data['type'],
         ]);
 
-        $match_soal = MatchSoal::findOrFail($data['match_soal'][0]['id']);
-        $match_soal->update([
-            'soal_id' => $data['match_soal'][0]['soal_id'],
-            'bidang_id' => $bidang->kode,
-        ]);
+        // Hapus match soal lama
+        $bidang->match_soal()->delete();
 
-        return redirect()->route('user-management.user.manager')->with('success', 'User updated successfully');
+        // Tambahkan match soal baru
+        foreach ($data['match_soal'] as $soalId) {
+            MatchSoal::create([
+                'soal_id' => $soalId,
+                'bidang_id' => $bidang->kode,
+            ]);
+        }
+
+        return redirect()->route('master-data.kategori-ujian.index')->with('success', 'Bidang updated successfully');
     }
 
     public function create()
@@ -79,22 +64,24 @@ class KategoriUjianEditController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'kategori_soal' => 'required|string',
-            'paket' => 'required|string',
+            'nama' => 'required|string',
+            'type' => 'required|string',
             'match_soal' => 'required|array',
-            'match_soal.*.soal_id' => 'required|integer|exists:m_soal,ids',
+            'match_soal.*' => 'required|integer|exists:m_soal,ids',
         ]);
 
         $bidang = Bidang::create([
-            'nama' => $data['kategori_soal'],
-            'paket' => $data['paket'],
+            'nama' => $data['nama'],
+            'type' => $data['type'],
         ]);
 
-        $match_soal = MatchSoal::create([
-            'soal_id' => $data['match_soal'][0]['soal_id'],
-            'bidang_id' => $bidang->kode,
-        ]);
+        foreach ($data['match_soal'] as $soalId) {
+            MatchSoal::create([
+                'soal_id' => $soalId,
+                'bidang_id' => $bidang->kode,
+            ]);
+        }
 
-        return redirect()->route('user-management.user.manager')->with('success', 'User created successfully');
+        return redirect()->route('master-data.kategori-ujian.index')->with('success', 'Bidang created successfully');
     }
 }

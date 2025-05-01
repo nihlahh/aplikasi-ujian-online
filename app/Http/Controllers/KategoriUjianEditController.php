@@ -28,16 +28,17 @@ class KategoriUjianEditController extends Controller
         $bidang = Bidang::findOrFail($id);
 
         $data = $request->validate([
-            'kategori_soal' => 'required|string',
+            'nama' => 'required|string',
             'paket' => 'required|string',
             'type' => 'nullable|string',
-            'match_soal' => 'required|array',
-            'match_soal.*.soal_id' => 'required|integer|exists:m_soal,ids',
+            'match_soal' => 'nullable|array',
+            'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);
 
         $bidang->update([
-            'nama' => $data['kategori_soal'],
-            'paket' => $data['paket'],
+            'kode' => $bidang->kode, // Kode tidak perlu diupdate
+            'nama' => $data['nama'],
+            // 'paket' => $data['paket'],
             'type' => $data['type'] ?? $bidang->type,
         ]);
 
@@ -52,7 +53,7 @@ class KategoriUjianEditController extends Controller
             ]);
         }
 
-        return redirect()->route('user-management.user.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
+        return redirect()->route('master-data.kategori-soal.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
     }
 
     public function create()
@@ -67,26 +68,28 @@ class KategoriUjianEditController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'kategori_soal' => 'required|string',
-            'paket' => 'required|string',
+            'nama' => 'required|string',
+            'paket' => 'nullable|string',
             'type' => 'nullable|string',
-            'match_soal' => 'required|array',
-            'match_soal.*.soal_id' => 'required|integer|exists:m_soal,ids',
+            'match_soal' => 'nullable|array',
+            'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);
 
         $bidang = Bidang::create([
-            'nama' => $data['kategori_soal'],
-            'paket' => $data['paket'],
+            'kode' => Bidang::max('kode') + 1,
+            'nama' => $data['nama'],
             'type' => $data['type'] ?? null,
         ]);
 
-        foreach ($data['match_soal'] as $item) {
-            MatchSoal::create([
-                'soal_id' => $item['soal_id'],
-                'bidang_id' => $bidang->kode,
-            ]);
+        if (isset($data['match_soal'])) {
+            foreach ($data['match_soal'] as $item) {
+                MatchSoal::create([
+                    'soal_id' => $item['soal_id'],
+                    'bidang_id' => $bidang->kode,
+                ]);
+            }
         }
 
-        return redirect()->route('user-management.user.manager')->with('success', 'Kategori ujian berhasil ditambahkan.');
+        return redirect()->route('master-data.kategori-ujian.manager')->with('success', 'Kategori ujian berhasil ditambahkan.');
     }
 }

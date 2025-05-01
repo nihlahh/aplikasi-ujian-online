@@ -22,10 +22,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface User {
-    id: number;
+    kode: number;
     nama: string;
     email: string;
     roles: { nam: string }[];
+    [x: string]: number | string | { nam: string }[]; // Adjusted index signature
 }
 
 export default function UserManager() {
@@ -58,18 +59,18 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
     const [open, setOpen] = useState(false);
     const [targetId, setTargetId] = useState<number | null>(null);
 
-    const handleDelete = (id: number) => {
-        setTargetId(id);
+    const handleDelete = (kode: number) => {
+        setTargetId(kode);
         setOpen(true);
     };
 
     const confirmDelete = async () => {
         try {
             if (targetId !== null) {
-                router.delete(route('user-management.user.destroy', targetId), {
+                router.delete(route('master-data.kategori-ujian.destroy', targetId), {
                     preserveState: true,
                     preserveScroll: true,
-                });
+                });                
             }
         } catch {
             toast.error('Unexpected error occurred');
@@ -113,9 +114,9 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             className: 'w-[100px] text-center',
             render: (user: User) => (
                 <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('user-management.user.show', user.id))} className="bg-yellow-500" />
-                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('user-management.user.edit', user.id))} />
-                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
+                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('user-management.user.show', user.kode))} className="bg-yellow-500" />
+                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('user-management.user.edit', user.kode))} />
+                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.kode)} />
                 </div>
             ),
         },

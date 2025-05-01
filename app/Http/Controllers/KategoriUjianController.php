@@ -32,16 +32,12 @@ class KategoriUjianController extends Controller
         );
     }
 
-    public function delete(Request $request, bidang $user)
-    {
-        if ($request->user()->id === $user->id) {
-            return redirect()->back()->with('error', 'You cannot delete your own account');
-        }
+    public function delete(Bidang $bidang)
+{
+    $bidang->delete();
+    return redirect()->back()->with('success', 'Data bidang berhasil dihapus');
+}
 
-        $user->delete();
-
-        return redirect()->back()->with('success', 'User deleted successfully');
-    }
 
     public function update(Request $request, bidang $user)
     {

@@ -11,24 +11,6 @@ const breadcrumbs = [
     { title: 'Bank Soal', href: '/master-data/bank-soal' },
     { title: 'Edit Soal', href: '/master-data/bank-soal/edit' },
 ];
-
-const InputField = ({ label, value, onChange, type = 'text', textarea = false }: {
-    label: string;
-    value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    type?: string;
-    textarea?: boolean;
-}) => (
-    <div>
-        <label className="block">{label}</label>
-        {textarea ? (
-            <textarea className="w-full border rounded px-3 py-2" value={value} onChange={onChange} />
-        ) : (
-            <input type={type} className="w-full border rounded px-3 py-2" value={value} onChange={onChange} />
-        )}
-    </div>
-);
-
 const Dropdown = ({ label, value, onChange, options }: {
     label: string;
     value: string;
@@ -114,7 +96,7 @@ export default function BankSoalEdit({ soal }: { soal: SoalForm }) {
         setData('suara', adaSuara ? 'iya' : 'tidak');
         setShowUpload(adaSuara);
         setAudioUrl(url);
-    }, [soal]);
+    }, [soal, setData, setShowUpload, setAudioUrl]);
 
     const convertToBase64 = (file: File): Promise<string> =>
         new Promise((resolve, reject) => {
@@ -127,7 +109,6 @@ export default function BankSoalEdit({ soal }: { soal: SoalForm }) {
         const ImageUpload = ({
             onUpload,
             uploaded,
-            onClear
         }: {
             onUpload: (base64: string) => void;
             uploaded: boolean;

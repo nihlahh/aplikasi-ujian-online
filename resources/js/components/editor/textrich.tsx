@@ -38,8 +38,6 @@ import { ClearFormattingToolbarPlugin } from "@/components/editor/plugins/toolba
 import { FontBackgroundToolbarPlugin } from '@/components/editor/plugins/toolbar/font-background-toolbar-plugin'
 import { FontColorToolbarPlugin } from '@/components/editor/plugins/toolbar/font-color-toolbar-plugin'
 import { ElementFormatToolbarPlugin } from "@/components/editor/plugins/toolbar/element-format-toolbar-plugin"
-import { BlockInsertPlugin } from "@/components/editor/plugins/toolbar/block-insert-plugin"
-import { InsertImage } from "@/components/editor/plugins/toolbar/block-insert/insert-image"
 
 import { ImagesPlugin } from "@/components/editor/plugins/images-plugin"
 import { ActionsPlugin } from "@/components/editor/plugins/actions/actions-plugin"
@@ -50,7 +48,7 @@ import { EditModeTogglePlugin } from '@/components/editor/plugins/actions/edit-m
 import { ClearEditorActionPlugin } from "@/components/editor/plugins/actions/clear-editor-plugin"
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin"
 
-import { $getRoot} from 'lexical';
+import { $getRoot, EditorState } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $createParagraphNode, $createTextNode } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
@@ -90,8 +88,6 @@ const convertToBase64 = (file: File): Promise<string> =>
 const ImageUpload = ({
   onUpload,
   uploaded,
-  onClear,
-  previewSrc,
 }: {
   onUpload: (base64: string) => void;
   uploaded: boolean;
@@ -182,12 +178,10 @@ export default function Editor({value, onChange }: EditorProps) {
     }
   };
 
-  const handleChange = (editorState: any) => {
+  const handleChange = (editorState: EditorState) => {
     editorState.read(() => {
       const root = $getRoot();
       const text = root.getTextContent();
-  
-      // Lewati trigger pertama kali jika masih inisialisasi
       if (!hasInitialized) {
         setHasInitialized(true);
         return;

@@ -49,8 +49,8 @@ export function InsertImageUriDialogBody({
 }: {
   onClick: (payload: InsertImagePayload) => void
 }) {
-  const [src, setSrc] = useState('')
-  const [altText, setAltText] = useState('')
+  const [src] = useState('')
+  const [altText] = useState('')
 
   const isDisabled = src === ''
 
@@ -76,7 +76,7 @@ export function InsertImageUploadedDialogBody({
   onClick: (payload: InsertImagePayload) => void
 }) {
   const [src, setSrc] = useState('')
-  const [altText, setAltText] = useState('')
+  const [altText] = useState('')
 
   const isDisabled = src === ''
 

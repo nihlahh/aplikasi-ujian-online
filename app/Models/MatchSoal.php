@@ -11,7 +11,7 @@ class MatchSoal extends Model
     public $timestamps = false;
     protected $fillable = [
         'soal_id',
-        'bidang_id',
+        'paket_id',
     ];
 
     public function soal()
@@ -19,8 +19,8 @@ class MatchSoal extends Model
         return $this->belongsTo(soal::class, 'soal_id', 'ids');
     }
 
-    public function bidang()
+    public function paket_soal()
     {
-        return $this->belongsTo(bidang::class, 'bidang_id', 'kode');
+        return $this->belongsTo(PaketSoal::class, 'paket_id', 'id');
     }
 }

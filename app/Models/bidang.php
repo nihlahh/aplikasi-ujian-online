@@ -13,18 +13,12 @@ class Bidang extends Model
     protected $primaryKey = 'kode';
 
     protected $fillable = [
-        'kode',
         'nama',
-        'type', // Tambahkan type di sini
+        'type',
     ];
 
-    public function match_soal()
+    public function paket_soal()
     {
-        return $this->hasMany(MatchSoal::class, 'bidang_id', 'kode');
-    }
-
-    public function jenis_ujian()
-    {
-        return $this->hasOne(JenisUjian::class, 'id_ujian', 'kode');
+        return $this->hasOne(PaketSoal::class, 'kode_bidang', 'kode');
     }
 }

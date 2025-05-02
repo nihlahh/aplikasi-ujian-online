@@ -6,21 +6,22 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\MatchSoal;
 use App\Models\bidang;
+use App\Models\PaketSoal;
 
-class KategoriUjianController extends Controller
+class PaketSoalController extends Controller
 {
     public function index(Request $request)
     {
         $pages = $request->query('pages', 10);
         $search = $request->query('search', null);
 
-        $usersQuery = bidang::withCount('match_soal'); 
+        $usersQuery = PaketSoal::withCount('match_soal'); 
         if ($search) {
-            $usersQuery->where('nama', 'like', '%' . $search . '%');
+            $usersQuery->where('nama_paket', 'like', '%' . $search . '%');
         }
 
         return Inertia::render(
-            'master-data/kategori-ujian/kategori-ujian',
+            'master-data/paket-soal/paket-soal',
             [
                 'data' => $usersQuery->paginate((int)$pages)->withQueryString(),
                 'filters' => [
@@ -31,18 +32,18 @@ class KategoriUjianController extends Controller
         );
     }
 
-    public function delete(Bidang $bidang)
+    public function delete(PaketSoal $bidang)
     {
-        $bidang=bidang::findOrFail($bidang->kode);
-        $bidang->match_soal()->delete(); // Delete related match_soal records
+        $bidang=PaketSoal::findOrFail($bidang->kode);
+        $bidang->match_soal()->delete(); 
         $bidang->delete();
 
         return redirect()->back()->with('success', 'Bidang deleted successfully');
     }
 
-    public function update(Request $request, bidang $user)
+    public function update(Request $request, PaketSoal $paket_soal)
     {
-        $user->update($request->all());
+        $paket_soal->update($request->all());
 
         return redirect()->back()->with('success', 'User updated successfully');
     }

@@ -9,9 +9,12 @@ use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\KategoriUjianEditController;
+use App\Http\Controllers\PaketSoalController;
+use App\Http\Controllers\PaketSoalEditController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Matakuliah;
+use App\Models\PaketSoal;
 
 // Custom route binding untuk Matakuliah model
 Route::bind('matakuliah', function ($value) {
@@ -80,13 +83,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
 
         Route::prefix('kategori-ujian')->name('kategori-ujian.')->group(function () {
-            Route::get('/', [KategoriUjianController::class, 'index'])->name('manager');
-            Route::get('{id}/edit', [KategoriUjianEditController::class, 'edit'])->name('edit');
-            Route::put('{id}', [KategoriUjianEditController::class, 'update'])->name('update');
-            Route::delete('/{bidang}', [KategoriUjianController::class, 'delete'])->name('destroy');
+            Route::get('/', [PaketSoalController::class, 'index'])->name('manager');
+            Route::get('{id}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
+            Route::put('{id}', [PaketSoalEditController::class, 'update'])->name('update');
+            Route::delete('/{bidang}', [PaketSoalController::class, 'delete'])->name('destroy');
 
-            Route::get('create', [KategoriUjianEditController::class, 'create'])->name('create');
-            Route::post('/', [KategoriUjianEditController::class, 'store'])->name('store');
+            Route::get('create', [PaketSoalEditController::class, 'create'])->name('create');
+            Route::post('/', [PaketSoalEditController::class, 'store'])->name('store');
         });
 
         Route::prefix('test')->name('user.')->group(function () {

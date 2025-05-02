@@ -11,8 +11,6 @@ class Soal extends Model
     protected $primaryKey = 'ids';
     public $timestamps = false;
     protected $fillable = [
-        'kategori_soal',
-        'paket',
     ];
     public function match_soal()
     {

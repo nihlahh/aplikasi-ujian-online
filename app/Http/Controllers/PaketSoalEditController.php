@@ -9,7 +9,7 @@ use App\Models\Soal;
 use Inertia\Inertia;
 use App\Models\JenisUjian;
 
-class KategoriUjianEditController extends Controller
+class PaketSoalEditController extends Controller
 {
     public function edit($id)
     {

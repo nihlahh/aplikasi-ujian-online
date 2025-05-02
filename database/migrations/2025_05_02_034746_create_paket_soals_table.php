@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('data_db')->create('match_soals', function (Blueprint $table) {
+        Schema::connection('data_db')->create('paket_soals', function (Blueprint $table) {
             $table->id();
-            $table->integer('soal_id')->nullable();
-            $table->integer('paket_id')->nullable();
+            $table->integer('kode_bidang');
+            $table->string('nama_paket');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('match_soals');
+        Schema::dropIfExists('paket_soals');
     }
 };

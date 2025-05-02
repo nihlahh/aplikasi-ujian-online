@@ -21,16 +21,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface User {
+interface PaketSoal {
     kode: number;
-    nama: string;
-    email: string;
-    roles: { nam: string }[];
+    nama_paket: string;
     [x: string]: number | string | { nam: string }[]; // Adjusted index signature
 }
 
 export default function UserManager() {
-    const { data: userData, filters, flash } = usePage<PageProps<User>>().props;
+    const { data: userData, filters, flash } = usePage<PageProps<PaketSoal>>().props;
 
     useEffect(() => {
         if (flash.success) toast.success(flash.success);
@@ -55,7 +53,7 @@ export default function UserManager() {
 
 
 
-function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedResponse<User>; pageFilters: PageFilter }) {
+function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedResponse<PaketSoal>; pageFilters: PageFilter }) {
     const [open, setOpen] = useState(false);
     const [targetId, setTargetId] = useState<number | null>(null);
 
@@ -95,34 +93,34 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
         {
             label: 'No',
             className: 'w-[100px] text-center',
-            render: (row: User) => (
+            render: (row: PaketSoal) => (
                 <div className="text-center font-medium">{(userData.current_page - 1) * userData.per_page + userData.data.indexOf(row) + 1}</div>
             ),
         },
         {
             label: 'Paket Soal',
             className: 'w-[800px] text-center',
-            render: (user: User) => user.nama,
+            render: (paket: PaketSoal) => paket.nama_paket,
         },
         {
             label: 'Total Soal', // Tambahkan kolom baru
             className: 'w-[200px] text-center',
-            render: (user: User) => (
+            render: (paket: PaketSoal) => (
                 <div className="text-center font-medium">
-                    {Array.isArray(user.match_soal_count)
-                        ? user.match_soal_count.map(item => item.nam).join(', ')
-                        : user.match_soal_count}
+                    {Array.isArray(paket.match_soal_count)
+                        ? paket.match_soal_count.map(item => item.nam).join(', ')
+                        : paket.match_soal_count}
                 </div>
         ),
         },
         {
             label: 'Action',
             className: 'w-[100px] text-center',
-            render: (user: User) => (
+            render: (paket: PaketSoal) => (
                 <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', user.kode))} className="bg-yellow-500" />
-                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', user.kode))} />
-                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.kode)} />
+                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', paket.kode))} className="bg-yellow-500" />
+                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', paket.kode))} />
+                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(paket.kode)} />
                 </div>
             ),
         },

@@ -4,6 +4,7 @@ use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\BankSoalController;
+use App\Http\Controllers\BankSoalControllerCheckbox;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\ExamScheduleController;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('paket-soal', function () {
             return Inertia::render('peserta');
         })->name('peserta');
+
+        // Route untuk bank soal checkbox
+        Route::get('banksoalcheckbox', [BankSoalControllerCheckbox::class, 'index'])->name('banksoalcheckbox');
 
         // Route show bank soal
         Route::get('bank-soal', [BankSoalController::class, 'index'])->name('bank.soal');

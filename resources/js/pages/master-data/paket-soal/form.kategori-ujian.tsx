@@ -44,8 +44,8 @@ export default function Dashboard() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Kategori Ujian',
-            href: '/master-data/kategori-ujian',
+            title: 'Paket Soal',
+            href: '/master-data/paket-soal',
         },
         {
             title: isEdit ? 'Edit' : 'Create',

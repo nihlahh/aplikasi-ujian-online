@@ -25,6 +25,6 @@ class Bidang extends Model
 
     public function jenis_ujian()
     {
-        return $this->hasMany(JenisUjian::class, 'id_ujian', 'kode');
+        return $this->hasOne(JenisUjian::class, 'id_ujian', 'kode');
     }
 }

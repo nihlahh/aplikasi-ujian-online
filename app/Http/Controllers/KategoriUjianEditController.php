@@ -37,7 +37,7 @@ class KategoriUjianEditController extends Controller
             'nama' => 'required|string',
             'type' => 'nullable|string',
             'paket' => 'nullable|string',
-            'jenis_ujian' => 'nullable|string',
+            'jenis_ujian' => 'nullable|string', 
             'match_soal' => 'nullable|array',
             'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);
@@ -89,7 +89,7 @@ class KategoriUjianEditController extends Controller
             'nama' => 'required|string',
             'paket' => 'nullable|string',
             'type' => 'nullable|string',
-            'jenis_ujian' => 'nullable|string',
+            'jenis_ujian' => 'nullable|string', // Pastikan jenis_ujian diizinkan
             'match_soal' => 'nullable|array',
             'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);

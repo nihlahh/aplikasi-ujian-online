@@ -34,10 +34,11 @@ const formSchema = z.object({
 
 export default function Dashboard() {
     const { bidang, typeOptions = [], jenisUjianOptions } = usePage<{
-        bidang?: { kode: number; nama: string; type: string; jenis_ujian: string };
+        bidang?: { kode: number; nama: string; type: string; jenis_ujian: { id_ujian: string; jenis_ujian: string }[];  };
         allCategories: { kode: string; name: string; }[];
         typeOptions: string[]; // Explicitly type typeOptions as an array of strings
         jenisUjianOptions: string[];
+        
     }>().props;
     const isEdit = !!bidang;
 
@@ -57,18 +58,21 @@ export default function Dashboard() {
         defaultValues: {
             nama: bidang?.nama ?? '',
             type: bidang?.type ?? '',
-            jenis_ujian: bidang?.jenis_ujian ?? '',
+            jenis_ujian: bidang?.jenis_ujian?.[0]?.jenis_ujian ?? '', // Ambil nilai jenis ujian dari backend
         },
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        const typeToSubmit = values.newType ? values.newType : values.type; // Gunakan type baru jika diisi
+        const typeToSubmit = values.newType ? values.newType : values.type;
+        const jenisUjianToSubmit = values.jenis_ujian;
+
         if (isEdit) {
             router.put(
-                route('master-data.kategori-ujian.update', bidang.kode), // Gunakan ID terkait
+                route('master-data.kategori-ujian.update', bidang.kode),
                 {
                     nama: values.nama,
                     type: typeToSubmit,
+                    jenis_ujian: jenisUjianToSubmit, // Kirim jenis ujian
                 },
                 {
                     preserveScroll: true,
@@ -86,6 +90,7 @@ export default function Dashboard() {
                 {
                     nama: values.nama,
                     type: typeToSubmit,
+                    jenis_ujian: jenisUjianToSubmit, 
                 },
                 {
                     preserveScroll: true,

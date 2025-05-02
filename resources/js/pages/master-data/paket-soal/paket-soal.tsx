@@ -65,12 +65,15 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
     const confirmDelete = async () => {
         try {
             if (targetId !== null) {
-                router.delete(route('master-data.kategori-ujian.destroy', targetId), {
+                console.log('Deleting ID:', targetId); // Debugging ID yang dikirim
+                await router.delete(route('master-data.paket-soal.destroy', targetId), {
                     preserveState: true,
                     preserveScroll: true,
-                });                
+                });
+                toast.success('Paket berhasil dihapus');
             }
-        } catch {
+        } catch (error) {
+            console.error('Error deleting paket:', error); // Debugging error
             toast.error('Unexpected error occurred');
         } finally {
             setOpen(false);
@@ -100,27 +103,27 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
         {
             label: 'Paket Soal',
             className: 'w-[800px] text-center',
-            render: (paket: PaketSoal) => paket.nama_paket,
+            render: (paket_soal: PaketSoal) => paket_soal.nama_paket,
         },
         {
-            label: 'Total Soal', // Tambahkan kolom baru
+            label: 'Total Soal', 
             className: 'w-[200px] text-center',
-            render: (paket: PaketSoal) => (
+            render: (paket_soal: PaketSoal) => (
                 <div className="text-center font-medium">
-                    {Array.isArray(paket.match_soal_count)
-                        ? paket.match_soal_count.map(item => item.nam).join(', ')
-                        : paket.match_soal_count}
+                    {Array.isArray(paket_soal.match_soal_count)
+                        ? paket_soal.match_soal_count.map(item => item.nam).join(', ')
+                        : paket_soal.match_soal_count}
                 </div>
         ),
         },
         {
             label: 'Action',
             className: 'w-[100px] text-center',
-            render: (paket: PaketSoal) => (
+            render: (paket_soal: PaketSoal) => (
                 <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', paket.id))} className="bg-yellow-500" />
-                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', paket.id))} />
-                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(paket.id)} />
+                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', paket_soal.id))} className="bg-yellow-500" />
+                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', paket_soal.id))} />
+                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(paket_soal.id)} />
                 </div>
             ),
         },

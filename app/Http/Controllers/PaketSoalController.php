@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\MatchSoal;
 use App\Models\bidang;
 use App\Models\PaketSoal;
+use Illuminate\Support\Facades\Log;
 
 class PaketSoalController extends Controller
 {
@@ -34,10 +35,22 @@ class PaketSoalController extends Controller
 
     public function delete(PaketSoal $paketSoal)
     {
-        PaketSoal::destroy($paketSoal->id);
-        MatchSoal::where('paket_id', $paketSoal->id)->delete();
-        
-        return redirect()->back()->with('success', 'Bidang deleted successfully');
+        try {
+            Log::info('Delete route called with ID:', ['id' => $paketSoal->id]);
+
+            // Hapus data terkait di tabel match_soals
+            MatchSoal::where('paket_id', $paketSoal->id)->delete();
+
+            // Hapus data di tabel paket_soals
+            $paketSoal->delete();
+
+            Log::info('PaketSoal deleted successfully:', ['id' => $paketSoal->id]);
+
+            return redirect()->back()->with('success', 'Paket deleted successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting PaketSoal:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Failed to delete Paket');
+        }
     }
 
     public function update(Request $request, PaketSoal $paket_soal)

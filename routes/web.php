@@ -58,35 +58,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('dashboard');
         })->name('index');
 
-        Route::get('peserta', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+        // Route::get('peserta', function () {
+        //     return Inertia::render('peserta');
+        // })->name('peserta');
 
-        Route::get('dosen', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+        // Route::get('dosen', function () {
+        //     return Inertia::render('peserta');
+        // })->name('peserta');
 
-        Route::get('kategori-ujian', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+        // Route::get('kategori-ujian', function () {
+        //     return Inertia::render('peserta');
+        // })->name('peserta');
 
-        Route::get('jenis-ujian', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+        // Route::get('jenis-ujian', function () {
+        //     return Inertia::render('peserta');
+        // })->name('peserta');
 
-        Route::get('jenisujian', [JenisUjianController::class, 'index']);
+        // Route::get('jenisujian', [JenisUjianController::class, 'index']);
 
-        Route::get('paket-soal', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+        // Route::get('paket-soal', function () {
+        //     return Inertia::render('peserta');
+        // })->name('peserta');
 
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
 
-        Route::prefix('paket-soal')->name('kategori-ujian.')->group(function () {
+        Route::prefix('paket-soal')->name('paket-soal.')->group(function () {
             Route::get('/', [PaketSoalController::class, 'index'])->name('manager');
             Route::get('{id}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
             Route::put('{id}', [PaketSoalEditController::class, 'update'])->name('update');
-            Route::delete('/{bidang}', [PaketSoalController::class, 'delete'])->name('destroy');
+            Route::delete('/{paket_soal}', [PaketSoalController::class, 'delete'])->name('destroy');
 
             Route::get('create', [PaketSoalEditController::class, 'create'])->name('create');
             Route::post('/', [PaketSoalEditController::class, 'store'])->name('store');

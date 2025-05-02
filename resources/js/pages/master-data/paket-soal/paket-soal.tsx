@@ -40,10 +40,10 @@ export default function UserManager() {
             <Head title="Data Paket Soal" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <ContentTitle title="Paket Soal" showButton onButtonClick={() => router.visit(route('master-data.kategori-ujian.create'))} />
+                <ContentTitle title="Paket Soal" showButton onButtonClick={() => router.visit(route('master-data.paket-soal.create'))} />
                 <div className="mt-4 flex items-center justify-between">
-                    <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="master-data.kategori-ujian.manager" />
-                    <SearchInputMenu defaultValue={filters.search} routeName="master-data.kategori-ujian.manager" />
+                    <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="master-data.paket-soal.manager" />
+                    <SearchInputMenu defaultValue={filters.search} routeName="master-data.paket-soal.manager" />
                 </div>
                 <UserTable data={userData} pageFilters={filters} />
             </div>
@@ -65,7 +65,7 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
     const confirmDelete = async () => {
         try {
             if (targetId !== null) {
-                router.delete(route('master-data.kategori-ujian.destroy', targetId), {
+                router.delete(route('master-data.paket-soal.destroy', targetId), {
                     preserveState: true,
                     preserveScroll: true,
                 });                
@@ -79,7 +79,7 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
 
     // Helper function to navigate with preserved search parameters
     const navigateToPage = (page: number) => {
-        router.visit(route('master-data.kategori-ujian.manager'), {
+        router.visit(route('master-data.paket-soal.manager'), {
             data: {
                 page: page,
                 search: filters.search,
@@ -118,8 +118,8 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             className: 'w-[100px] text-center',
             render: (paket: PaketSoal) => (
                 <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', paket.kode))} className="bg-yellow-500" />
-                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', paket.kode))} />
+                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.paket-soal.show', paket.kode))} className="bg-yellow-500" />
+                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.paket-soal.edit', paket.kode))} />
                     <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(paket.kode)} />
                 </div>
             ),

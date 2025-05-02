@@ -14,11 +14,11 @@ class Bidang extends Model
 
     protected $fillable = [
         'nama',
-        'type', // Tambahkan type di sini
+        'type',
     ];
 
-    public function match_soal()
+    public function paket_soal()
     {
-        return $this->hasMany(MatchSoal::class, 'bidang_id', 'kode');
+        return $this->hasOne(PaketSoal::class, 'kode_bidang', 'kode');
     }
 }

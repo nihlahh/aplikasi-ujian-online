@@ -36,7 +36,7 @@ export default function Dashboard() {
     const { bidang, typeOptions = [], jenisUjianOptions } = usePage<{
         bidang?: { kode: number; nama: string; type: string; jenis_ujian: string; };
         allCategories: { kode: string; name: string; }[];
-        typeOptions: string[]; // Explicitly type typeOptions as an array of strings
+        typeOptions: string[]; 
         jenisUjianOptions: string[];
         
     }>().props;
@@ -68,7 +68,7 @@ export default function Dashboard() {
 
         if (isEdit) {
             router.put(
-                route('master-data.kategori-ujian.update', bidang.kode),
+                route('master-data.paket-soal.update', bidang.kode),
                 {
                     nama: values.nama,
                     type: typeToSubmit,
@@ -86,7 +86,7 @@ export default function Dashboard() {
             );
         } else {
             router.post(
-                route('master-data.kategori-ujian.store'),
+                route('master-data.paket-soal.store'),
                 {
                     nama: values.nama,
                     type: typeToSubmit,
@@ -111,26 +111,13 @@ export default function Dashboard() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="space-between flex items-center justify-between">
                     <h1 className="text-2xl font-bold">{isEdit ? 'Edit' : 'Create'} User</h1>
-                    <CButton type="primary" className="md:w-24" onClick={() => router.visit(route('master-data.kategori-ujian.manager'))}>
+                    <CButton type="primary" className="md:w-24" onClick={() => router.visit(route('master-data.paket-soal.manager'))}>
                         Back
                     </CButton>
                 </div>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        <FormField
-                            control={form.control}
-                            name="nama"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Nama paket pjian</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter your username" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
+                    <FormField
                             control={form.control}
                             name="type"
                             render={({ field }) => (
@@ -178,6 +165,21 @@ export default function Dashboard() {
                                 </FormItem>
                             )}
                         />
+                        <FormField
+                            control={form.control}
+                            name="nama"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nama paket ujian</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter your username" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        
+                        
                         <CButton type="submit">Save</CButton>
                     </form>
                 </Form>

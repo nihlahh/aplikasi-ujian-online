@@ -8,17 +8,18 @@ use App\Models\MatchSoal;
 use App\Models\Soal;
 use Inertia\Inertia;
 use App\Models\JenisUjian;
+use App\Models\PaketSoal;
 
 class PaketSoalEditController extends Controller
 {
     public function edit($id)
     {
-        $bidang = Bidang::with(['match_soal', 'jenis_ujian'])->findOrFail($id);
+        $paket_soal = PaketSoal::with(['match_soal', 'bidang'])->findOrFail($id);
 
-        return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
-            'bidang' => $bidang,
+        return Inertia::render('master-data/paket-soal/form.paket-soal', [
+            'paket-soal' => $paket_soal,
             'soalList' => Soal::all(),
-            'selectedSoal' => $bidang->match_soal->pluck('soal_id'),
+            'selectedSoal' => $paket_soal->match_soal->pluck('soal_id'),
             'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
             'typeOptions' => Bidang::select('type')->distinct()->pluck('type'),
             'jenisUjianOptions' => JenisUjian::select('jenis_ujian')->distinct()->pluck('jenis_ujian'), // Ambil jenis ujian unik

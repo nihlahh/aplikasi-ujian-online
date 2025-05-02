@@ -32,12 +32,11 @@ class PaketSoalController extends Controller
         );
     }
 
-    public function delete(PaketSoal $bidang)
+    public function delete(PaketSoal $paketSoal)
     {
-        $bidang=PaketSoal::findOrFail($bidang->kode);
-        $bidang->match_soal()->delete(); 
-        $bidang->delete();
-
+        PaketSoal::destroy($paketSoal->id);
+        MatchSoal::where('paket_id', $paketSoal->id)->delete();
+        
         return redirect()->back()->with('success', 'Bidang deleted successfully');
     }
 

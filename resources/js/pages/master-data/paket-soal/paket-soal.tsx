@@ -22,7 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface PaketSoal {
-    kode: number;
+    id: number;
     nama_paket: string;
     [x: string]: number | string | { nam: string }[]; // Adjusted index signature
 }
@@ -57,8 +57,8 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
     const [open, setOpen] = useState(false);
     const [targetId, setTargetId] = useState<number | null>(null);
 
-    const handleDelete = (kode: number) => {
-        setTargetId(kode);
+    const handleDelete = (id: number) => {
+        setTargetId(id);
         setOpen(true);
     };
 
@@ -118,9 +118,9 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             className: 'w-[100px] text-center',
             render: (paket: PaketSoal) => (
                 <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', paket.kode))} className="bg-yellow-500" />
-                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', paket.kode))} />
-                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(paket.kode)} />
+                    <CButtonIcon icon={List} type="primary" onClick={() => router.visit(route('master-data.kategori-ujian.show', paket.id))} className="bg-yellow-500" />
+                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.kategori-ujian.edit', paket.id))} />
+                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(paket.id)} />
                 </div>
             ),
         },

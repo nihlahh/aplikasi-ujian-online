@@ -22,4 +22,9 @@ class Bidang extends Model
     {
         return $this->hasMany(MatchSoal::class, 'bidang_id', 'kode');
     }
+
+    public function jenis_ujian()
+    {
+        return $this->hasMany(JenisUjian::class, 'id_ujian', 'kode');
+    }
 }

@@ -24,16 +24,20 @@ const formSchema = z.object({
     }),
     type: z.string().optional(), // Type dari dropdown
     newType: z.string().optional(), // Type baru
+    jenis_ujian: z.string().min(2, {
+        message: 'Inputkan jenis ujian',
+    }),
 }).refine((data) => data.type || data.newType, {
     message: 'Pilih type atau masukkan type baru',
     path: ['type'], // Error akan ditampilkan di field type
 });
 
 export default function Dashboard() {
-    const { bidang, typeOptions = [] } = usePage<{
-        bidang?: { kode: number; nama: string; type: string };
-        allCategories: { kode: string; name: string }[];
+    const { bidang, typeOptions = [], jenisUjianOptions } = usePage<{
+        bidang?: { kode: number; nama: string; type: string; jenis_ujian: string };
+        allCategories: { kode: string; name: string; }[];
         typeOptions: string[]; // Explicitly type typeOptions as an array of strings
+        jenisUjianOptions: string[];
     }>().props;
     const isEdit = !!bidang;
 
@@ -53,6 +57,7 @@ export default function Dashboard() {
         defaultValues: {
             nama: bidang?.nama ?? '',
             type: bidang?.type ?? '',
+            jenis_ujian: bidang?.jenis_ujian ?? '',
         },
     });
 
@@ -146,12 +151,23 @@ export default function Dashboard() {
                         />
                         <FormField
                             control={form.control}
-                            name="nama"
+                            name="jenis_ujian"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Pilih Soal</FormLabel>
+                                    <FormLabel>Jenis Ujian</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Pilih Soal" {...field} />
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Pilih atau ketik jenis ujian" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {jenisUjianOptions.map((jenis_ujian: string) => (
+                                                    <SelectItem key={jenis_ujian} value={jenis_ujian}>
+                                                        {jenis_ujian}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

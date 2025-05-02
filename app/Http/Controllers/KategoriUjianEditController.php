@@ -7,26 +7,21 @@ use App\Models\Bidang;
 use App\Models\MatchSoal;
 use App\Models\Soal;
 use Inertia\Inertia;
+use App\Models\JenisUjian;
 
 class KategoriUjianEditController extends Controller
 {
     public function edit($id)
     {
-        if (!is_numeric($id)) {
-            return redirect()->back()->with('error', 'ID tidak valid.');
-        }
-        if(Bidang::where('kode', $id)->count() == 0) {
-            return redirect()->back()->with('error', 'Bidang tidak ditemukan.');
-        }
-
-        $bidang = Bidang::with('match_soal')->findOrFail($id);
+        $bidang = Bidang::with(['match_soal', 'jenis_ujian'])->findOrFail($id);
 
         return Inertia::render('master-data/kategori-ujian/form.kategori-ujian', [
-            'bidang' => $bidang, 
-            'soalList' => Soal::all(), 
-            'selectedSoal' => $bidang->match_soal->pluck('soal_id'), 
-            'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(), 
-            'typeOptions' => Bidang::select('type')->distinct()->pluck('type'), 
+            'bidang' => $bidang,
+            'soalList' => Soal::all(),
+            'selectedSoal' => $bidang->match_soal->pluck('soal_id'),
+            'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
+            'typeOptions' => Bidang::select('type')->distinct()->pluck('type'),
+            'jenisUjianOptions' => JenisUjian::select('jenis_ujian')->distinct()->pluck('jenis_ujian'), // Ambil jenis ujian unik
         ]);
     }
 
@@ -41,20 +36,23 @@ class KategoriUjianEditController extends Controller
         $data = $request->validate([
             'nama' => 'required|string',
             'type' => 'nullable|string',
+            'paket' => 'nullable|string',
+            'jenis_ujian' => 'nullable|string',
             'match_soal' => 'nullable|array',
             'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);
 
+        // Update Bidang
         $bidang->update([
             'nama' => $data['nama'],
             'type' => $data['type'] ?? $bidang->type,
         ]);
 
-        // Hapus match sebelumnya
-        MatchSoal::where('bidang_id', $bidang->kode)->delete();
+        // Hapus match_soal lama
+        $bidang->match_soal()->delete();
 
-        // Simpan ulang semua soal terhubung
-        if (isset($data['match_soal'])) {
+        // Tambahkan ulang match_soal baru
+        if (!empty($data['match_soal'])) {
             foreach ($data['match_soal'] as $item) {
                 MatchSoal::create([
                     'soal_id' => $item['soal_id'],
@@ -63,8 +61,17 @@ class KategoriUjianEditController extends Controller
             }
         }
 
+        // Update atau buat data JenisUjian
+        if (!empty($data['jenis_ujian'])) {
+            JenisUjian::updateOrCreate(
+                ['id_ujian' => $bidang->kode],
+                ['jenis_ujian' => $data['jenis_ujian']]
+            );
+        }
+
         return redirect()->route('master-data.kategori-ujian.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
     }
+
 
     public function create()
     {
@@ -72,6 +79,7 @@ class KategoriUjianEditController extends Controller
             'bidang' => null,
             'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
             'typeOptions' => Bidang::select('type')->distinct()->pluck('type'),
+            'jenisUjianOptions' => JenisUjian::select('jenis_ujian')->distinct()->pluck('jenis_ujian'), // Ambil jenis ujian unik
         ]);
     }
 
@@ -81,21 +89,35 @@ class KategoriUjianEditController extends Controller
             'nama' => 'required|string',
             'paket' => 'nullable|string',
             'type' => 'nullable|string',
+            'jenis_ujian' => 'nullable|string',
             'match_soal' => 'nullable|array',
             'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);
 
+        // Hitung kode baru
+        $newKode = Bidang::max('kode') + 1;
+
+        // Simpan ke tabel bidang
         $bidang = Bidang::create([
-            'kode' => Bidang::max('kode') + 1,
+            'kode' => $newKode,
             'nama' => $data['nama'],
             'type' => $data['type'] ?? null,
         ]);
 
-        if (isset($data['match_soal'])) {
+        // Simpan jenis ujian (jika ada)
+        if (!empty($data['jenis_ujian'])) {
+            JenisUjian::create([
+                'id_ujian' => $newKode,
+                'jenis_ujian' => $data['jenis_ujian'],
+            ]);
+        }
+
+        // Simpan relasi soal (jika ada)
+        if (!empty($data['match_soal'])) {
             foreach ($data['match_soal'] as $item) {
                 MatchSoal::create([
                     'soal_id' => $item['soal_id'],
-                    'bidang_id' => $bidang->kode,
+                    'bidang_id' => $newKode,
                 ]);
             }
         }

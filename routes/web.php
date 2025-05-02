@@ -82,7 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
 
-        Route::prefix('kategori-ujian')->name('kategori-ujian.')->group(function () {
+        Route::prefix('paket-soal')->name('kategori-ujian.')->group(function () {
             Route::get('/', [PaketSoalController::class, 'index'])->name('manager');
             Route::get('{id}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
             Route::put('{id}', [PaketSoalEditController::class, 'update'])->name('update');

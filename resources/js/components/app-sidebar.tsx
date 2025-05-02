@@ -64,7 +64,7 @@ const items: MainNavItem[] = [
             },
             {
                 title: 'Paket Soal',
-                href: '/master-data/paket-soal',
+                href: '/master-data/paket-soal/',
                 icon: Book,
             },
             {

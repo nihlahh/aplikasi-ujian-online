@@ -40,7 +40,7 @@ export default function UserManager() {
             <Head title="Data Paket Soal" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <ContentTitle title="Data Paket Soal" showButton onButtonClick={() => router.visit(route('master-data.kategori-ujian.create'))} />
+                <ContentTitle title="Paket Soal" showButton onButtonClick={() => router.visit(route('master-data.kategori-ujian.create'))} />
                 <div className="mt-4 flex items-center justify-between">
                     <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="master-data.kategori-ujian.manager" />
                     <SearchInputMenu defaultValue={filters.search} routeName="master-data.kategori-ujian.manager" />

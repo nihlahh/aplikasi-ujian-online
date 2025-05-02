@@ -34,7 +34,7 @@ const formSchema = z.object({
 
 export default function Dashboard() {
     const { bidang, typeOptions = [], jenisUjianOptions } = usePage<{
-        bidang?: { kode: number; nama: string; type: string; jenis_ujian: { id_ujian: string; jenis_ujian: string }[];  };
+        bidang?: { kode: number; nama: string; type: string; jenis_ujian: string; };
         allCategories: { kode: string; name: string; }[];
         typeOptions: string[]; // Explicitly type typeOptions as an array of strings
         jenisUjianOptions: string[];
@@ -58,7 +58,7 @@ export default function Dashboard() {
         defaultValues: {
             nama: bidang?.nama ?? '',
             type: bidang?.type ?? '',
-            jenis_ujian: bidang?.jenis_ujian?.[0]?.jenis_ujian ?? '', // Ambil nilai jenis ujian dari backend
+            jenis_ujian: bidang?.jenis_ujian ?? '', 
         },
     });
 

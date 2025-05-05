@@ -9,6 +9,8 @@ use App\Models\Soal;
 use Inertia\Inertia;
 use App\Models\JenisUjian;
 use App\Models\PaketSoal;
+use Illuminate\Validation\Rule;
+
 
 class PaketSoalEditController extends Controller
 {
@@ -19,17 +21,21 @@ class PaketSoalEditController extends Controller
         if (!$bidang) {
             return redirect()->back()->with('error', 'Bidang tidak ditemukan.');
         }
+        $options = Bidang::select('kode', 'type', 'nama')->get();
 
         return Inertia::render('master-data/paket-soal/form.paket-soal', [
             'paket' => [
                 'id' => $paket_soal->id,
                 'kode_bidang' => $paket_soal->kode_bidang,
+                'options' => $options,
                 'jenis_ujian' => $bidang->nama,
                 'nama_paket_ujian' => $paket_soal->nama_paket,
                 'kategori_ujian' => $bidang->type,
                 'match_soal' => $paket_soal->match_soal,
-            ]
-        ]);
+            ],
+            'kategori_option' => $bidang->type,
+            'jenis_option' => $bidang->nama,
+        ]);        
     }
 
     public function update(Request $request, $id)
@@ -40,7 +46,12 @@ class PaketSoalEditController extends Controller
         $bidang = Bidang::where('kode', $kode)->first();
         $data = $request->validate([
             'nama_paket_ujian' => 'required|string',
-            'kode_bidang' => 'required|integer|exists:m_bidang,kode',
+            'kode_bidang' => [
+                'required',
+                'integer',
+                Rule::exists('data_db.m_bidang', 'kode'),
+            ],
+
             'kategori_ujian' => 'nullable|string',
             'match_soal' => 'nullable|array',
             'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
@@ -71,19 +82,33 @@ class PaketSoalEditController extends Controller
 
     public function create()
     {
+        $typeOptions = Bidang::select('type')->distinct()->pluck('type');
+        $jenisUjianOptions = Bidang::select('nama')->distinct()->pluck('nama');
+        $options = Bidang::select('kode', 'type', 'nama')->get();
+
         return Inertia::render('master-data/paket-soal/form.paket-soal', [
-            'bidang' => null,
+            'paket' => null, // agar props 'paket' tetap konsisten antara edit dan create
             'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
-            'typeOptions' => Bidang::select('type')->distinct()->pluck('type'),
-            'jenisUjianOptions' => JenisUjian::select('jenis_ujian')->distinct()->pluck('jenis_ujian'), // Ambil jenis ujian unik
+            'options' => $options,
+            'typeOptions' => $typeOptions,
+            'jenisUjianOptions' => $jenisUjianOptions,
+            'kategori_option' => $typeOptions,
+            'jenis_option' => $jenisUjianOptions,
         ]);
     }
 
+
     public function store(Request $request)
     {
+        $options = Bidang::select('kode', 'type', 'nama')->get();
         $data = $request->validate([
             'nama_paket_ujian' => 'required|string',
-            'kode_bidang' => 'required|integer|exists:m_bidang,kode',
+            'kode_bidang' => [
+                'required',
+                'integer',
+                Rule::exists('data_db.m_bidang', 'kode'),
+            ],
+
             'kategori_ujian' => 'required|string',
             'match_soal' => 'nullable|array',
             'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',

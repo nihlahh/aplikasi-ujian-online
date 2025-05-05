@@ -87,7 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('{id}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
             Route::put('{id}', [PaketSoalEditController::class, 'update'])->name('update');
             Route::delete('/{paket_soal}', [PaketSoalController::class, 'delete'])->name('destroy');
-
+            Route::get('/search', [PaketSoalEditController::class, 'index'])->name('serch');
             Route::get('create', [PaketSoalEditController::class, 'create'])->name('create');
             Route::post('/', [PaketSoalEditController::class, 'store'])->name('store');
         });

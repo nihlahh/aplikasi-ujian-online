@@ -17,25 +17,18 @@ class PaketSoalEditController extends Controller
     public function edit($id)
     {
         $paket_soal = PaketSoal::with(['match_soal', 'bidang'])->findOrFail($id);
-        $bidang = Bidang::where('kode', $paket_soal->kode_bidang)->first();
-        if (!$bidang) {
-            return redirect()->back()->with('error', 'Bidang tidak ditemukan.');
-        }
         $options = Bidang::select('kode', 'type', 'nama')->get();
 
         return Inertia::render('master-data/paket-soal/form.paket-soal', [
             'paket' => [
                 'id' => $paket_soal->id,
                 'kode_bidang' => $paket_soal->kode_bidang,
-                'options' => $options,
-                'jenis_ujian' => $bidang->nama,
+                'jenis_ujian' => $paket_soal->bidang->nama,
                 'nama_paket_ujian' => $paket_soal->nama_paket,
-                'kategori_ujian' => $bidang->type,
-                'match_soal' => $paket_soal->match_soal,
+                'kategori_ujian' => $paket_soal->bidang->type,
             ],
-            'kategori_option' => $bidang->type,
-            'jenis_option' => $bidang->nama,
-        ]);        
+            'options' => $options, // Data kategori dan jenis ujian
+        ]);
     }
 
     public function update(Request $request, $id)
@@ -82,18 +75,11 @@ class PaketSoalEditController extends Controller
 
     public function create()
     {
-        $typeOptions = Bidang::select('type')->distinct()->pluck('type');
-        $jenisUjianOptions = Bidang::select('nama')->distinct()->pluck('nama');
         $options = Bidang::select('kode', 'type', 'nama')->get();
 
         return Inertia::render('master-data/paket-soal/form.paket-soal', [
-            'paket' => null, // agar props 'paket' tetap konsisten antara edit dan create
-            'allCategories' => Soal::select('ids as id', 'kategori_soal as name')->get(),
-            'options' => $options,
-            'typeOptions' => $typeOptions,
-            'jenisUjianOptions' => $jenisUjianOptions,
-            'kategori_option' => $typeOptions,
-            'jenis_option' => $jenisUjianOptions,
+            'paket' => null,
+            'options' => $options, // Data kategori dan jenis ujian
         ]);
     }
 
@@ -131,5 +117,50 @@ class PaketSoalEditController extends Controller
         }
 
         return redirect()->route('master-data.paket-soal.manager')->with('success', 'Kategori ujian berhasil ditambahkan.');
+    }
+
+    public function edit_soal($id)
+    {
+        $paket_soal = PaketSoal::with(['match_soal', 'bidang'])->findOrFail($id);
+        $options = Bidang::select('kode', 'type', 'nama')->get();
+        $soal = Soal::all();
+
+        return Inertia::render('master-data/paket-soal/form.paket-soal-soal', [
+            'paket' => [
+                'id' => $paket_soal->id,
+                'kode_bidang' => $paket_soal->kode_bidang,
+                'jenis_ujian' => $paket_soal->bidang->nama,
+                'nama_paket_ujian' => $paket_soal->nama_paket,
+                'kategori_ujian' => $paket_soal->bidang->type,
+            ],
+            'options' => $options, // Data kategori dan jenis ujian
+            'soals' => $soal, // Data soal
+        ]);
+    }
+
+    public function update_soal(Request $request, $id)
+    {
+        $paket_soal = PaketSoal::findOrFail($id);
+        $data = $request->validate([
+            'match_soal' => 'nullable|array',
+            'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
+        ]);
+
+        $matchSoal = $data['match_soal'] ?? [];
+
+        if (!empty($matchSoal)) {
+            // Hapus semua relasi soal yang ada
+            MatchSoal::where('paket_id', $paket_soal->id)->delete();
+
+            // Simpan relasi soal baru
+            foreach ($matchSoal as $item) {
+                MatchSoal::create([
+                    'soal_id' => $item['soal_id'],
+                    'paket_id' => $paket_soal->id,
+                ]);
+            }
+        }
+
+        return redirect()->route('master-data.paket-soal.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
     }
 }

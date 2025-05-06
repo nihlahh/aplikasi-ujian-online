@@ -22,6 +22,7 @@ import {
   import { useForm } from 'react-hook-form';
   import { toast } from 'sonner';
   import { z } from 'zod';
+  import { useEffect, useState } from 'react';
   
   const formSchema = z.object({
     nama_paket_ujian: z.string().min(2, {
@@ -63,8 +64,34 @@ import {
       },
     });
   
-    const kategoriList = Array.from(new Set(options.map((o) => o.type)));
-    const jenisList = Array.from(new Set(options.map((o) => o.nama)));
+    const [filteredJenis, setFilteredJenis] = useState<string[]>([]);
+    const [filteredKategori, setFilteredKategori] = useState<string[]>([]);
+  
+    // Filter jenis ujian berdasarkan kategori
+    useEffect(() => {
+      const kategori = form.watch('kategori_ujian');
+      const jenis = form.watch('jenis_ujian');
+  
+      if (kategori) {
+        setFilteredJenis(
+          options
+            .filter((option) => option.type === kategori)
+            .map((option) => option.nama)
+        );
+      } else {
+        setFilteredJenis(options.map((option) => option.nama));
+      }
+  
+      if (jenis) {
+        setFilteredKategori(
+          options
+            .filter((option) => option.nama === jenis)
+            .map((option) => option.type)
+        );
+      } else {
+        setFilteredKategori(options.map((option) => option.type));
+      }
+    }, [form.watch('kategori_ujian'), form.watch('jenis_ujian')]);
   
     function onSubmit(values: z.infer<typeof formSchema>) {
       const matched = options.find(
@@ -123,12 +150,15 @@ import {
                   <FormItem>
                     <FormLabel>Kategori Ujian</FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Pilih kategori ujian" />
                         </SelectTrigger>
                         <SelectContent>
-                          {kategoriList.map((kategori) => (
+                          {filteredKategori.map((kategori) => (
                             <SelectItem key={kategori} value={kategori}>
                               {kategori}
                             </SelectItem>
@@ -147,12 +177,15 @@ import {
                   <FormItem>
                     <FormLabel>Jenis Ujian</FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Pilih jenis ujian" />
                         </SelectTrigger>
                         <SelectContent>
-                          {jenisList.map((jenis) => (
+                          {filteredJenis.map((jenis) => (
                             <SelectItem key={jenis} value={jenis}>
                               {jenis}
                             </SelectItem>
@@ -187,4 +220,3 @@ import {
       </AppLayout>
     );
   }
-  

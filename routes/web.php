@@ -6,6 +6,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\BankSoalController;
+use App\Http\Controllers\BankSoalControllerCheckbox;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\KategoriUjianEditController;
@@ -76,29 +77,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Route::get('jenisujian', [JenisUjianController::class, 'index']);
 
-        // Route::get('paket-soal', function () {
-        //     return Inertia::render('peserta');
-        // })->name('peserta');
+        Route::get('paket-soal', function () {
+            return Inertia::render('peserta');
+        })->name('peserta');
 
-        Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
+        // Route show bank soal
+        Route::get('bank-soal', [BankSoalController::class, 'index'])->name('bank.soal');
 
-        Route::prefix('paket-soal')->name('paket-soal.')->group(function () {
-            Route::get('/', [PaketSoalController::class, 'index'])->name('manager');
-            Route::get('{id}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
-            Route::put('{id}', [PaketSoalEditController::class, 'update'])->name('update');
-            Route::delete('/{paket_soal}', [PaketSoalController::class, 'delete'])->name('destroy');
-            Route::get('/search', [PaketSoalEditController::class, 'index'])->name('serch');
-            Route::get('create', [PaketSoalEditController::class, 'create'])->name('create');
-            Route::post('/', [PaketSoalEditController::class, 'store'])->name('store');
-        });
+        // Route hapus bank soal
+        Route::delete('bank-soal/{id}', [BankSoalController::class, 'destroy'])->name('bank.soal.destroy');
 
-        Route::prefix('test')->name('user.')->group(function () {
-            Route::get('/', [TestController::class, 'index'])->name('manager');
-            Route::get('{id}/edit', [UserManagerEditController::class, 'edit'])->name('edit');
-            Route::put('{id}', [UserManagerEditController::class, 'update'])->name('update');
-            Route::delete('{user}', [UserManagerController::class, 'delete'])->name('destroy');
-            Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
-            Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
+        // Route edit bank soal
+        Route::put('bank-soal/update/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
+        Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
+
+        // Route tambah bank soal
+        Route::get('bank-soal/create', function () {
+            return Inertia::render('banksoalcreate');
+        })->name('bank.soal.create');
+
+        Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
+                
+        // Route untuk matakuliah dipindahkan ke dalam grup master-data
+        Route::prefix('matakuliah')->name('matakuliah.')->group(function () {
+            Route::get('/', [MatkulController::class, 'index'])->name('index');
+            Route::get('/create', [MatkulController::class, 'create'])->name('create');
+            Route::post('/', [MatkulController::class, 'store'])->name('store');
+            Route::get('/{matakuliah}/edit', [MatkulController::class, 'edit'])->name('edit');
+            Route::put('/{matakuliah}', [MatkulController::class, 'update'])->name('update');
+            Route::delete('/{matakuliah}', [MatkulController::class, 'destroy'])->name('destroy');
         });
     });
 

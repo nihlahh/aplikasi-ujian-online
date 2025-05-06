@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\DosenImport;
+use App\Models\Dosen;
 
 class DosenManagerController extends Controller
 {
@@ -13,7 +16,7 @@ class DosenManagerController extends Controller
         $pages = $request->query('pages', 10);
         $search = $request->query('search', null);
 
-        $usersQuery = User::role('dosen')->with('roles');
+        $usersQuery = User::role('dosen')->with(['roles', 'dosen']);
         
         if ($search) {
             $usersQuery->where('name', 'like', '%' . $search . '%')
@@ -48,5 +51,30 @@ class DosenManagerController extends Controller
         $user->update($request->all());
 
         return redirect()->back()->with('success', 'User updated successfully');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls',
+        ]);
+
+        try {
+            Excel::import(new DosenImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Import data dosen berhasil.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return redirect()->back()->with('error', 'Validasi file gagal.')->with('failures', $e->failures());
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal import: ' . $e->getMessage());
+        }
+    }
+
+    // Debugging di DosenManagerController
+    public function debug()
+    {
+        $users = User::role('dosen')->with('dosen')->get();
+        foreach ($users as $user) {
+            logger()->info('User NIP: ' . $user->nip . ', Aktif: ' . optional($user->dosen)->aktif);
+        }
     }
 }

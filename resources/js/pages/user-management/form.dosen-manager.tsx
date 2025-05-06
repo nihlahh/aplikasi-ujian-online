@@ -11,7 +11,18 @@ import { CButton } from '@/components/ui/c-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Role, User } from '@/types';
+import { type BreadcrumbItem, Role } from '@/types';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    roles: string[];
+    dosen?: {
+        nip: string;
+        aktif: boolean;
+    };
+}
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
@@ -32,6 +43,14 @@ const formSchema = z.object({
         .optional()
         .refine((val) => !val || val.length >= 8, { message: 'Password must be at least 8 characters.' }),
     roles: z.array(z.string()).nonempty('Please select at least one item'),
+    nip: z.string().min(2, {
+        message: 'NIP must be at least 2 characters.',
+    }),
+    aktif: z.boolean(),
+    dosen: z.object({
+        nip: z.string(),
+        aktif: z.boolean(),
+    }),
 });
 
 export default function Dashboard() {
@@ -56,11 +75,13 @@ export default function Dashboard() {
             email: user?.email ?? '',
             password: '',
             roles: user?.roles?.length ? user.roles : [],
+            nip: user?.dosen?.nip ?? '',
+            aktif: user?.dosen?.aktif ?? false,
         },
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
+        console.log('Form Values:', values); // Debugging
         if (isEdit) {
             router.put(
                 route('master-data.dosen.update', user.id),
@@ -68,6 +89,8 @@ export default function Dashboard() {
                     name: values.username,
                     email: values.email,
                     roles: values.roles,
+                    nip: values.nip,
+                    aktif: values.aktif,
                 },
                 {
                     preserveScroll: true,
@@ -90,6 +113,8 @@ export default function Dashboard() {
                     email: values.email,
                     password: values.password,
                     roles: values.roles,
+                    nip: values.nip,
+                    aktif: values.aktif,
                 },
                 {
                     preserveScroll: true,
@@ -185,6 +210,32 @@ export default function Dashboard() {
                                                 </MultiSelectorList>
                                             </MultiSelectorContent>
                                         </MultiSelector>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="nip"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>NIP</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter your NIP" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="aktif"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Aktif</FormLabel>
+                                    <FormControl>
+                                        <Input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

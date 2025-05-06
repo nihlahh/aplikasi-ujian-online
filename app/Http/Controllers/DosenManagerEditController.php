@@ -6,13 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use App\Models\Dosen;
 
 class DosenManagerEditController extends Controller
 {
     public function edit($id)
     {
-        $user = User::with('roles')->findOrFail($id);
+        $user = User::with('roles')->findOrFail($id)->with('dosen');
         $allRoles = Role::all();
+
 
         return Inertia::render('user-management/form.dosen-manager', [
             'user' => [
@@ -29,17 +31,25 @@ class DosenManagerEditController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $dosen = Dosen::where('nip', $user->nip)->first();
 
         $data = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
             'roles' => 'nullable|array',
             'roles.*' => 'string|exists:roles,name',
+            'nip' => 'required|string|exists:dosen,nip',
+            'aktif' => 'required|boolean',
         ]);
 
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
+        ]);
+
+        $dosen->update([
+            'nip' => $data['nip'],
+            'aktif' => $data['aktif'],
         ]);
 
         if (isset($data['roles'])) {
@@ -67,12 +77,19 @@ class DosenManagerEditController extends Controller
             'password' => 'required|string|min:8',
             'roles' => 'nullable|array',
             'roles.*' => 'string|exists:roles,name',
+            'nip' => 'required|string|unique:dosen,nip',
+            'aktif' => 'required|boolean',
         ]);
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
+        ]);
+
+        $dosen = Dosen::create([
+            'nip' => $data['nip'],
+            'aktif' => $data['aktif'],
         ]);
 
         if (isset($data['roles'])) {

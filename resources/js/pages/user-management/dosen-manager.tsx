@@ -26,6 +26,10 @@ interface Dosen{
     name: string;
     email: string;
     roles: { name: string }[];
+    dosen: {
+        nip: string;
+        aktif: boolean;
+    };
 }
 
 export default function UserManager() {
@@ -137,6 +141,20 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
                 </div>
             ),
         },
+        {
+            label: 'NIP',
+            className: 'w-[100px] text-center',
+            render: (user: Dosen) => <div className="text-center font-medium">{user.dosen?.nip}</div>,
+        },
+        {
+            label: 'Aktif',
+            className: 'w-[100px] text-center',
+            render: (user: Dosen) => (
+                <div className="text-center font-medium">
+                    {user.dosen?.aktif ? 'Aktif' : 'Tidak Aktif'}
+                </div>
+            ),
+        }
     ];
 
     return (

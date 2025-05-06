@@ -45,7 +45,24 @@ export default function UserManager() {
             <Head title="Dosen Manager" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <ContentTitle title="Data Dosen" showButton onButtonClick={() => router.visit(route('master-data.dosen.create'))} />
+            <div className="flex items-center justify-between">
+  <ContentTitle title="Data Dosen" showButton={false} />
+  <div className="flex gap-2">
+    <button
+      onClick={() => router.visit(route('master-data.dosen.import'))}
+      className="rounded bg-green-600 px-4 py-2 text-white shadow hover:bg-green-700"
+    >
+      Import
+    </button>
+    <button
+      onClick={() => router.visit(route('master-data.dosen.create'))}
+      className="rounded bg-blue-600 px-4 py-2 text-white shadow hover:bg-blue-700"
+    >
+      + Add
+    </button>
+  </div>
+</div>
+
                 <div className="mt-4 flex items-center justify-between">
                     <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="master-data.dosen.manager" />
                     <SearchInputMenu defaultValue={filters.search} routeName="master-data.dosen.manager" />
@@ -112,6 +129,11 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             render: (user: Dosen) => <div className="text-center font-medium">{user.id}</div>,
         },
         {
+            label: 'NIP',
+            className: 'w-[100px] text-center',
+            render: (user: Dosen) => <div className="text-center font-medium">{user.dosen?.nip}</div>,
+        },
+        {
             label: 'Name',
             className: 'w-[400px]',
             render: (user: Dosen) => user.name,
@@ -120,6 +142,23 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             label: 'Email',
             className: 'w-[400px]',
             render: (user: Dosen) => user.email,
+        },
+        {
+            label: 'Aktif',
+            className: 'w-[100px] text-center',
+            render: (user: Dosen) => (
+                <div className="flex justify-center">
+                    {user.dosen?.aktif ? (
+                        <span className="rounded bg-green-500 px-2 py-1 text-white text-xs shadow">
+                            Aktif
+                        </span>
+                    ) : (
+                        <span className="rounded bg-red-500 px-2 py-1 text-white text-xs shadow">
+                            Tidak Aktif
+                        </span>
+                    )}
+                </div>
+            ),
         },
         {
             label: 'Roles',
@@ -131,30 +170,17 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
                 </div>
             ),
         },
+        
         {
-        label: 'Action',
-            className: 'w-[100px] text-center',
-            render: (user: Dosen) => (
-                <div className="flex justify-center gap-2">
-                    <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.dosen.edit', user.id))} />
-                    <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
-                </div>
-            ),
-        },
-        {
-            label: 'NIP',
-            className: 'w-[100px] text-center',
-            render: (user: Dosen) => <div className="text-center font-medium">{user.dosen?.nip}</div>,
-        },
-        {
-            label: 'Aktif',
-            className: 'w-[100px] text-center',
-            render: (user: Dosen) => (
-                <div className="text-center font-medium">
-                    {user.dosen?.aktif ? 'Aktif' : 'Tidak Aktif'}
-                </div>
-            ),
-        }
+            label: 'Action',
+                className: 'w-[100px] text-center',
+                render: (user: Dosen) => (
+                    <div className="flex justify-center gap-2">
+                        <CButtonIcon icon={Pencil} onClick={() => router.visit(route('master-data.dosen.edit', user.id))} />
+                        <CButtonIcon icon={Trash2} type="danger" onClick={() => handleDelete(user.id)} />
+                    </div>
+                ),
+            },
     ];
 
     return (

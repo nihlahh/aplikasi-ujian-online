@@ -12,7 +12,8 @@ class DosenManagerEditController extends Controller
 {
     public function edit($id)
     {
-        $user = User::with('roles')->findOrFail($id)->with('dosen');
+        $user = User::with(['roles', 'dosen'])->findOrFail($id);
+        $dosen = Dosen::where('nip', $user->nip)->first();
         $allRoles = Role::all();
 
 
@@ -21,7 +22,9 @@ class DosenManagerEditController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'roles' => $user->roles->pluck('name')
+                'roles' => $user->roles->pluck('name'),
+                'nip' => $dosen->nip,
+                'aktif' => $dosen->aktif,
             ],
             'allRoles' => $allRoles
         ]);
@@ -38,7 +41,7 @@ class DosenManagerEditController extends Controller
             'email' => 'required|email',
             'roles' => 'nullable|array',
             'roles.*' => 'string|exists:roles,name',
-            'nip' => 'required|string|exists:dosen,nip',
+            'nip' => 'required|string|exists:data_db.t_guru,nip',
             'aktif' => 'required|boolean',
         ]);
 
@@ -50,6 +53,7 @@ class DosenManagerEditController extends Controller
         $dosen->update([
             'nip' => $data['nip'],
             'aktif' => $data['aktif'],
+            'nama' => $data['name'],
         ]);
 
         if (isset($data['roles'])) {
@@ -77,11 +81,12 @@ class DosenManagerEditController extends Controller
             'password' => 'required|string|min:8',
             'roles' => 'nullable|array',
             'roles.*' => 'string|exists:roles,name',
-            'nip' => 'required|string|unique:dosen,nip',
+            'nip' => 'required|string|unique:data_db.t_guru,nip',
             'aktif' => 'required|boolean',
         ]);
 
         $user = User::create([
+            'nip' => $data['nip'],
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
@@ -90,6 +95,8 @@ class DosenManagerEditController extends Controller
         $dosen = Dosen::create([
             'nip' => $data['nip'],
             'aktif' => $data['aktif'],
+            'password' => bcrypt($data['password']),
+            'nama' => $data['name'],
         ]);
 
         if (isset($data['roles'])) {

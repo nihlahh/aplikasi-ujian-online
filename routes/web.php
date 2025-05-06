@@ -9,6 +9,7 @@ use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerCreateController;
 use App\Http\Controllers\UserManagerEditController;
+use App\Http\Controllers\DosenImportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Matakuliah;
@@ -84,6 +85,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('import', [DosenManagerController::class, 'import'])->name('import');
             Route::post('/', [DosenManagerEditController::class, 'store'])->name('store');
         });
+
+        Route::get('/import-dosen', function () {
+            return Inertia::render('import-dosen');
+        });
+        
+        Route::post('/import-dosen', [DosenImportController::class, 'import']);
         
 
         // Route show bank soal

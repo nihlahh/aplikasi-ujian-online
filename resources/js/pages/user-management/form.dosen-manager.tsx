@@ -75,8 +75,10 @@ export default function Dashboard() {
             email: user?.email ?? '',
             password: '',
             roles: user?.roles?.length ? user.roles : [],
-            nip: user?.dosen?.nip ?? '',
-            aktif: user?.dosen?.aktif ?? false,
+            dosen: {
+                nip: user?.dosen?.nip ?? '',
+                aktif: user?.dosen?.aktif ?? false,
+            },
         },
     });
 
@@ -232,10 +234,10 @@ export default function Dashboard() {
                             control={form.control}
                             name="aktif"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="flex flex-col items-start space-y-1">
                                     <FormLabel>Aktif</FormLabel>
                                     <FormControl>
-                                        <Input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                                        <Input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} className="scale-75" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

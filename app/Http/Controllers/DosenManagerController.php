@@ -41,6 +41,12 @@ class DosenManagerController extends Controller
             return redirect()->back()->with('error', 'You cannot delete your own account');
         }
 
+        $dosen = \App\Models\Dosen::where('nip', $user->nip)->first();
+        if ($dosen) {
+            $dosen->delete();
+        }
+
+
         $user->delete();
 
         return redirect()->back()->with('success', 'User deleted successfully');

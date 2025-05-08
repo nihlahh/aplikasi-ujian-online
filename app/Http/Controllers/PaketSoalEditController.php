@@ -31,12 +31,8 @@ class PaketSoalEditController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, PaketSoal $paket_soal)
     {
-        $paket_soal = PaketSoal::findOrFail($id); 
-        $kode = $paket_soal->kode_bidang; 
-
-        $bidang = Bidang::where('kode', $kode)->first();
         $data = $request->validate([
             'nama_paket_ujian' => 'required|string',
             'kode_bidang' => [
@@ -44,10 +40,6 @@ class PaketSoalEditController extends Controller
                 'integer',
                 Rule::exists('data_db.m_bidang', 'kode'),
             ],
-
-            'kategori_ujian' => 'nullable|string',
-            'match_soal' => 'nullable|array',
-            'match_soal.*.soal_id' => 'nullable|integer|exists:m_soal,ids',
         ]);
 
         $paket_soal->update([
@@ -55,23 +47,9 @@ class PaketSoalEditController extends Controller
             'kode_bidang' => $data['kode_bidang'],
         ]);
 
-        $matchSoal = $data['match_soal'] ?? [];
-        if (!empty($matchSoal)) {
-            // Hapus semua relasi soal yang ada
-            MatchSoal::where('paket_id', $paket_soal->id)->delete();
-
-            // Simpan relasi soal baru
-            foreach ($matchSoal as $item) {
-                MatchSoal::create([
-                    'soal_id' => $item['soal_id'],
-                    'paket_id' => $paket_soal->id,
-                ]);
-            }
-        }
-
-        return redirect()->route('master-data.paket-soal.manager')->with('success', 'Kategori ujian berhasil diperbarui.');
+        return redirect()->route('master-data.paket-soal.manager')
+            ->with('success', 'Paket soal berhasil diperbarui.');
     }
-
 
     public function create()
     {
@@ -83,6 +61,27 @@ class PaketSoalEditController extends Controller
         ]);
     }
 
+    public function store_data(Request $request)
+    {
+        $data = $request->validate([
+            'nama_paket_ujian' => 'required|string',
+            'kode_bidang' => [
+                'required',
+                'integer',
+                Rule::exists('data_db.m_bidang', 'kode'),
+            ],
+            'kategori_ujian' => 'required|string',
+        ]);
+    
+        $paket_soal = PaketSoal::create([
+            'nama_paket' => $data['nama_paket_ujian'],
+            'kode_bidang' => $data['kode_bidang'],
+            'kategori_ujian' => $data['kategori_ujian'],
+        ]);
+    
+        return redirect()->route('master-data.bank-soal-checkbox.edit', $paket_soal->id)
+            ->with('success', 'Paket soal berhasil dibuat.');
+    }
 
     public function store(Request $request)
     {

@@ -77,10 +77,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Route::get('jenisujian', [JenisUjianController::class, 'index']);
 
-        Route::get('paket-soal', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
-
         // Route show bank soal
         Route::get('bank-soal', [BankSoalController::class, 'index'])->name('bank.soal');
 
@@ -106,6 +102,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{matakuliah}/edit', [MatkulController::class, 'edit'])->name('edit');
             Route::put('/{matakuliah}', [MatkulController::class, 'update'])->name('update');
             Route::delete('/{matakuliah}', [MatkulController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('paket-soal')->name('paket-soal.')->group(function () {
+            Route::get('/', [PaketSoalController::class, 'index'])->name('manager');
+            Route::get('/create', [PaketSoalEditController::class, 'create'])->name('create');
+            Route::post('/', [PaketSoalEditController::class, 'store'])->name('store');
+            Route::get('/{paket_soal}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
+            Route::put('/{paket_soal}', [PaketSoalEditController::class, 'update'])->name('update');
+            Route::delete('/{paket_soal}', [PaketSoalController::class, 'delete'])->name('destroy');
+            Route::post('/store',[PaketSoalEditController::class, 'store_data'])->name('store_data');
+        });
+
+        Route::prefix('bank-soal-checkbox')->name('bank-soal-checkbox.')->group(function () {
+            Route::get('/', [BankSoalControllerCheckbox::class, 'index'])->name('index');
+            Route::get('/{paket_soal}/edit', [BankSoalControllerCheckbox::class, 'edit'])->name('edit');
+            Route::put('/{paket_soal}', [BankSoalControllerCheckbox::class, 'update'])->name('update');
         });
     });
 

@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\MatchSoal;
-use App\Models\bidang;
+use App\Models\Bidang;
 use App\Models\PaketSoal;
 use Illuminate\Support\Facades\Log;
+
 
 class PaketSoalController extends Controller
 {
@@ -17,6 +18,7 @@ class PaketSoalController extends Controller
         $search = $request->query('search', null);
 
         $usersQuery = PaketSoal::withCount('match_soal'); 
+
         if ($search) {
             $usersQuery->where('nama_paket', 'like', '%' . $search . '%');
         }

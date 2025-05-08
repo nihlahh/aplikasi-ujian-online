@@ -83,10 +83,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Route hapus bank soal
         Route::delete('bank-soal/{id}', [BankSoalController::class, 'destroy'])->name('bank.soal.destroy');
 
-        // Route edit bank soal
-        Route::put('bank-soal/update/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
-        Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
-
         // Route tambah bank soal
         Route::get('bank-soal/create', function () {
             return Inertia::render('banksoalcreate');
@@ -142,6 +138,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 });
-
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

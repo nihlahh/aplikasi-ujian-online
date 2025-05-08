@@ -19,6 +19,6 @@ class Bidang extends Model
 
     public function paket_soal()
     {
-        return $this->hasMany(PaketSoal::class, 'kode_bidang', 'kode');
+        return $this->hasOne(PaketSoal::class, 'kode_bidang', 'kode');
     }
 }

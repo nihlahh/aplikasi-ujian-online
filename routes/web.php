@@ -87,6 +87,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('bank-soal/create', function () {
             return Inertia::render('banksoalcreate');
         })->name('bank.soal.create');
+        // Route edit bank soal
+        Route::put('bank-soal/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
+        Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
 
         Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
                 

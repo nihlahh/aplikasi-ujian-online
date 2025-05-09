@@ -13,7 +13,7 @@ class DosenImportController extends Controller
     public function importView()
     {
         Log::debug('Navigating to import view');  // Debugging ketika mengakses view
-        return Inertia::render('ImportDosen');
+        return Inertia::render('dosen-management/ImportDosen');
     }
 
     public function import(Request $request)

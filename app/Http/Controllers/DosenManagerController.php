@@ -24,7 +24,7 @@ class DosenManagerController extends Controller
         }
 
         return Inertia::render(
-            'user-management/dosen-manager',
+            'dosen-management/dosen-manager',
             [
                 'data' => $usersQuery->paginate((int)$pages)->withQueryString(),
                 'filters' => [

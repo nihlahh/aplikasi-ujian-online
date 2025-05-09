@@ -14,7 +14,7 @@ class DosenManagerEditController extends Controller
     {
         $user = User::with(['roles', 'dosen'])->findOrFail($id);
 
-        return Inertia::render('user-management/form.dosen-manager', [
+        return Inertia::render('dosen-management/form.dosen-manager', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -77,7 +77,7 @@ class DosenManagerEditController extends Controller
     {
         $allRoles = Role::all();
 
-        return Inertia::render('user-management/form.dosen-manager', [
+        return Inertia::render('dosen-management/form.dosen-manager', [
             'user' => null,
             'allRoles' => $allRoles
         ]);

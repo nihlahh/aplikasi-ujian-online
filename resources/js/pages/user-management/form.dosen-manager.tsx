@@ -24,6 +24,7 @@ interface User {
     };
 }
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -234,12 +235,23 @@ export default function Dashboard() {
                             control={form.control}
                             name="aktif"
                             render={({ field }) => (
-                                <FormItem className="flex flex-col items-start space-y-1">
-                                    <FormLabel>Aktif</FormLabel>
-                                    <FormControl>
-                                        <Input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} className="scale-75" />
-                                    </FormControl>
-                                    <FormMessage />
+                                <FormItem>
+                                <FormLabel>Aktif</FormLabel>
+                                <FormControl>
+                                    <Select
+                                    value={field.value ? "true" : "false"}
+                                    onValueChange={(value: string) => field.onChange(value === "true")}
+                                    >
+                                    <SelectTrigger className="w-[200px]">
+                                        <SelectValue placeholder="Pilih status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="true">Aktif</SelectItem>
+                                        <SelectItem value="false">Tidak Aktif</SelectItem>
+                                    </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
                                 </FormItem>
                             )}
                         />

@@ -13,9 +13,6 @@ class DosenManagerEditController extends Controller
     public function edit($id)
     {
         $user = User::with(['roles', 'dosen'])->findOrFail($id);
-        $dosen = Dosen::where('nip', $user->nip)->first();
-        $allRoles = Role::all();
-
 
         return Inertia::render('user-management/form.dosen-manager', [
             'user' => [
@@ -23,13 +20,12 @@ class DosenManagerEditController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'roles' => $user->roles->pluck('name'),
-                'nip' => $dosen->nip,
-                'aktif' => $dosen->aktif,
+                'nip' => $user->dosen->nip ?? '', // Ambil dari relasi
+                'aktif' => $user->dosen->aktif ?? false, // Ambil dari relasi
             ],
-            'allRoles' => $allRoles
+            'allRoles' => Role::all(),
         ]);
     }
-
 
     public function update(Request $request, $id)
     {
@@ -38,24 +34,38 @@ class DosenManagerEditController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'roles' => 'nullable|array',
             'roles.*' => 'string|exists:roles,name',
-            'nip' => 'required|string|exists:data_db.t_guru,nip',
+            'nip' => 'required|string|unique:data_db.t_guru,nip,' . $request->nip . ',nip',
             'aktif' => 'required|boolean',
         ]);
 
+        // Update data user
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
+            'nip' => $data['nip'], // Perbarui NIP di tabel users
         ]);
 
-        $dosen->update([
-            'nip' => $data['nip'],
-            'aktif' => $data['aktif'],
-            'nama' => $data['name'],
-        ]);
+        // Update or create data dosen
+        $dosen = Dosen::where('nip', $user->nip)->first();
 
+        if ($dosen) {
+            $dosen->update([
+                'nip' => $data['nip'], // Perbarui NIP di tabel t_guru
+                'aktif' => $data['aktif'],
+                'nama' => $data['name'],
+            ]);
+        } else {
+            Dosen::create([
+                'nip' => $data['nip'],
+                'aktif' => $data['aktif'],
+                'nama' => $data['name'],
+            ]);
+        }
+
+        // Sinkronisasi roles
         if (isset($data['roles'])) {
             $user->syncRoles($data['roles']);
         }

@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('peserta');
         })->name('peserta');
 
+
         Route::prefix('dosen')->name('dosen.')->group(function () {
             Route::get('/', [DosenManagerController::class, 'index'])->name('manager');
             Route::get('{id}/edit', [DosenManagerEditController::class, 'edit'])->name('edit');
@@ -84,14 +85,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('create', [DosenManagerEditController::class, 'create'])->name('create');
             Route::post('import', [DosenManagerController::class, 'import'])->name('import');
             Route::post('/', [DosenManagerEditController::class, 'store'])->name('store');
-        });
-
-        Route::get('/import-dosen', function () {
-            return Inertia::render('import-dosen');
+            Route::post('import', [DosenImportController::class, 'import'])->name('import');
         });
         
-        Route::post('/import-dosen', [DosenImportController::class, 'import']);
-        
+        Route::prefix('import')->name('import.')->group(function () {
+            Route::get('/', [DosenImportController::class, 'importView'])->name('view');
+        });
 
         // Route show bank soal
         Route::get('bank-soal', [BankSoalController::class, 'index'])->name('bank.soal');

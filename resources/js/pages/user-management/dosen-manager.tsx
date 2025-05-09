@@ -48,20 +48,20 @@ export default function UserManager() {
             <div className="flex items-center justify-between">
   <ContentTitle title="Data Dosen" showButton={false} />
   <div className="flex gap-2">
-    <button
-      onClick={() => router.visit(route('master-data.dosen.import'))}
-      className="rounded bg-green-600 px-4 py-2 text-white shadow hover:bg-green-700"
-    >
-      Import
-    </button>
-    <button
-      onClick={() => router.visit(route('master-data.dosen.create'))}
-      className="rounded bg-blue-600 px-4 py-2 text-white shadow hover:bg-blue-700"
-    >
-      + Add
-    </button>
-  </div>
-</div>
+            <button
+            onClick={() => router.visit(route('master-data.import.view'))}
+            className="rounded bg-green-600 px-4 py-2 text-white shadow hover:bg-green-700"
+            >
+            Import
+            </button>
+            <button
+            onClick={() => router.visit(route('master-data.dosen.create'))}
+            className="rounded bg-[#6A86B6] px-4 py-2 text-white shadow hover:bg-gray-700"
+            >
+            + Add
+            </button>
+        </div>
+        </div>
 
                 <div className="mt-4 flex items-center justify-between">
                     <EntriesSelector currentValue={userData.per_page} options={[10, 12, 25, 50, 100]} routeName="master-data.dosen.manager" />
@@ -73,16 +73,18 @@ export default function UserManager() {
     );
 }
 
+const baseClass = "inline-block w-[90px] rounded px-2 py-1 text-center text-white text-xs shadow";
+
 const RoleDecorator: React.FC<{ role: string }> = ({ role }) => {
     switch (role) {
         case 'super_admin':
-            return <span className="bg-button-danger mr-2 rounded p-2 text-white shadow">{role}</span>;
+            return <span className={`${baseClass} bg-red-700`}>{role}</span>;
         case 'admin':
-            return <span className="mr-2 rounded bg-yellow-500 p-2 text-white shadow">{role}</span>;
+            return <span className={`${baseClass} bg-yellow-500`}>{role}</span>;
         case 'dosen':
-                return <span className="mr-2 rounded bg-pink-500 p-2 text-white shadow">{role}</span>;
+            return <span className={`${baseClass} bg-pink-500`}>{role}</span>;
         default:
-            return <span className="mr-2 text-white">{role}</span>;
+            return <span className={`${baseClass} bg-gray-400`}>{role}</span>;
     }
 };
 
@@ -130,8 +132,7 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
         },
         {
             label: 'NIP',
-            className: 'w-[100px] text-center',
-            render: (user: Dosen) => <div className="text-center font-medium">{user.dosen?.nip}</div>,
+            render: (user: Dosen) => user.dosen?.nip,
         },
         {
             label: 'Name',
@@ -144,16 +145,16 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
             render: (user: Dosen) => user.email,
         },
         {
-            label: 'Aktif',
+            label: 'Status',
             className: 'w-[100px] text-center',
             render: (user: Dosen) => (
                 <div className="flex justify-center">
                     {user.dosen?.aktif ? (
-                        <span className="rounded bg-green-500 px-2 py-1 text-white text-xs shadow">
+                        <span className="inline-block w-[80px] rounded bg-green-500 px-2 py-1 text-center text-white text-xs shadow">
                             Aktif
                         </span>
                     ) : (
-                        <span className="rounded bg-red-500 px-2 py-1 text-white text-xs shadow">
+                        <span className="inline-block w-[80px] rounded bg-red-500 px-2 py-1 text-center text-white text-xs shadow">
                             Tidak Aktif
                         </span>
                     )}
@@ -162,6 +163,7 @@ function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedRe
         },
         {
             label: 'Roles',
+            className: 'w-[100px] text-center',
             render: (user: Dosen) => (
                 <div className="flex flex-wrap gap-1">
                     {user.roles.map((r) => (

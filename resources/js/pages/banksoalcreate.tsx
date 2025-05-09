@@ -4,6 +4,8 @@ import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import AppLayout from '@/layouts/app-layout';
 import { toast } from 'sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import Editor from '@/components/editor/textrich';
 
 const breadcrumbs = [
     {
@@ -15,32 +17,6 @@ const breadcrumbs = [
         href: '/master-data/bank-soal/create',
     },
 ];
-
-const InputField = ({ label, value, onChange, type = 'text', textarea = false }: {
-    label: string;
-    value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    type?: string;
-    textarea?: boolean;
-}) => (
-    <div>
-        <label className="block">{label}</label>
-        {textarea ? (
-            <textarea
-                className="w-full border rounded px-3 py-2"
-                value={value}
-                onChange={onChange}
-            />
-        ) : (
-            <input
-                type={type}
-                className="w-full border rounded px-3 py-2"
-                value={value}
-                onChange={onChange}
-            />
-        )}
-    </div>
-);
 
 const Dropdown = ({ label, value, onChange, options }: {
     label: string;
@@ -67,13 +43,13 @@ const Dropdown = ({ label, value, onChange, options }: {
 interface SoalForm {
     kategori_soal: string;
     suara: string;
-    footer_soal: string;
+    header_soal: string;
     body_soal: string;
+    footer_soal: string;
     jw_1: string;
     jw_2: string;
     jw_3: string;
     jw_4: string;
-    jw_5: string;
     jw_fix: string;
     file: File | null;
     [key: string]: string | File | null;
@@ -83,14 +59,14 @@ export default function BankSoalCreate() {
     const { data, setData, processing } = useForm<SoalForm>({
         kategori_soal: '',
         suara: 'tidak',
-        footer_soal: '',
+        header_soal: '',
         body_soal: '',
+        footer_soal: '',
         jw_1: '',
         jw_2: '',
         jw_3: '',
         jw_4: '',
-        jw_5: '',
-        jw_fix: '',
+        jw_fix: '0',
         file: null,
     });
 
@@ -112,6 +88,8 @@ export default function BankSoalCreate() {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
+        console.log('Data yang dikirim:', data);
+
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
             const value = data[key as keyof SoalForm];
@@ -129,7 +107,6 @@ export default function BankSoalCreate() {
                 console.error(errors);
             }
         });
-        
     };
 
     return (
@@ -212,49 +189,81 @@ export default function BankSoalCreate() {
                         </div>
                     )}
 
-                    <InputField
-                        label="Footer Soal"
-                        value={data.footer_soal}
-                        onChange={(e) => setData('footer_soal', e.target.value)}
-                        textarea
-                    />
-                    <InputField
-                        label="Body Soal"
-                        value={data.body_soal}
-                        onChange={(e) => setData('body_soal', e.target.value)}
-                        textarea
-                    />
+                    {/* Header Soal */}
+                    <div>
+                        <label className="text-m text-foreground">Header Soal</label>
+                        <div className="w-full overflow-hidden rounded-lg border bg-background space-y-2">
+                            <TooltipProvider>
+                                <Editor
+                                    value={data.header_soal}
+                                    onChange={(value: string) => setData('header_soal', value)} 
+                                />
+                            </TooltipProvider>
+                        </div>
+                    </div>
 
-                    {['jw_1', 'jw_2', 'jw_3', 'jw_4', 'jw_5'].map((key, i) => (
-                        <InputField
-                            key={key}
-                            label={`Jawaban ${String.fromCharCode(65 + i)}`}
-                            value={data[key as keyof SoalForm] as string}
-                            onChange={(e) => setData(key as keyof SoalForm, e.target.value)}
-                            textarea
-                        />
-                    ))}
+                    {/* Body Soal */}
+                    <div>
+                        <label className="text-m text-foreground">Body Soal</label>
+                        <div className="w-full overflow-hidden rounded-lg border bg-background space-y-2">
+                            <TooltipProvider>
+                                <Editor
+                                    value={data.body_soal}
+                                    onChange={(value: string) => setData('body_soal', value)}
+                                />
+                            </TooltipProvider>
+                        </div>
+                    </div>
 
-                    <Dropdown
-                        label="Jawaban Benar"
-                        value={data.jw_fix}
-                        onChange={(e) => setData('jw_fix', e.target.value)}
-                        options={[
-                            { value: '', label: 'Pilih Jawaban' },
-                            { value: '1', label: 'A' },
-                            { value: '2', label: 'B' },
-                            { value: '3', label: 'C' },
-                            { value: '4', label: 'D' },
-                            { value: '5', label: 'E' },
-                        ]}
-                    />
-                    <button
-                        type="submit"
-                        className="bg-[#6784AE] hover:bg-[#56729B] text-white px-4 py-2 rounded-md mt-4"
-                        disabled={processing}
-                    >
-                        Simpan Soal
-                    </button>
+                    {/* Footer Soal */}
+                    <div>
+                        <label className="text-m text-foreground">Footer Soal</label>
+                        <div className="w-full overflow-hidden rounded-lg border bg-background space-y-2">
+                            <TooltipProvider>
+                                <Editor
+                                    value={data.footer_soal}
+                                    onChange={(value: string) => setData('footer_soal', value)} 
+                                />
+                            </TooltipProvider>
+                        </div>
+                    </div>
+
+                    {/* Jawaban Soal */}
+                    {['jw_1', 'jw_2', 'jw_3', 'jw_4'].map((key, i) => {
+                        const label = i === 0 ? `Jawaban ${String.fromCharCode(65 + i)} (Jawaban Benar)` : `Jawaban ${String.fromCharCode(65 + i)}`;
+                        return (
+                            <div key={key}>
+                                <label className="text-m text-foreground">
+                                    {label}
+                                </label>
+                                <div className="w-full overflow-hidden rounded-lg border bg-background space-y-2">
+                                    <TooltipProvider>
+                                        <Editor
+                                            value={data[key as keyof SoalForm]?.toString() || ''}
+                                            onChange={(value: string) => setData(key as keyof SoalForm, value)} 
+                                        />
+                                    </TooltipProvider>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    <div className="flex gap-4 mt-4">
+                        <button
+                            type="button"
+                            onClick={() => router.visit('/master-data/bank-soal')}
+                            className="bg-[#AC080C] hover:bg-[#8C0A0F] text-white px-4 py-2 rounded-md"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="bg-[#6784AE] hover:bg-[#56729B] text-white px-4 py-2 rounded-md"
+                            disabled={processing}
+                        >
+                            Simpan Soal
+                        </button>
+                    </div>
                 </form>
             </div>
         </AppLayout>

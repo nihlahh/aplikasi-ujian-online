@@ -99,7 +99,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('bank-soal/{id}', [BankSoalController::class, 'destroy'])->name('bank.soal.destroy');
 
         // Route edit bank soal
-        Route::put('bank-soal/update/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
+        Route::put('bank-soal/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
         Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
 
         // Route tambah bank soal

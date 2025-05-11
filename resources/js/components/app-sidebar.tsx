@@ -77,6 +77,11 @@ const items: MainNavItem[] = [
                 icon: BookA,
                 href: '/master-data/matakuliah',
             },
+            {
+                title: 'Event',
+                icon: BookA,
+                href: '/master-data/event',
+            },
         ],
     },
     {

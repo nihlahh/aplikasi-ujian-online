@@ -2,7 +2,6 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { CButton } from '@/components/ui/c-button';
 
 export default function ImportDosen() {
   const [file, setFile] = useState<File | null>(null);

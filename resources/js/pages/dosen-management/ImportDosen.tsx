@@ -2,6 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { CButton } from '@/components/ui/c-button';
 
 export default function ImportDosen() {
   const [file, setFile] = useState<File | null>(null);
@@ -28,7 +29,7 @@ export default function ImportDosen() {
     <AppLayout>
       <Head title="Import Data Dosen" />
 
-      <div className="p-6 space-y-4">
+      <div className="p-6 space-y-">
         <h1 className="text-2xl font-semibold">Import Data Dosen</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">

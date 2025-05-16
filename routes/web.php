@@ -4,9 +4,11 @@ use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\BankSoalController;
+use App\Http\Controllers\BankSoalControllerCheckbox;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\ExamScheduleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\JenisUjianEditController;
 use Inertia\Inertia;
 use App\Models\Matakuliah;
 
@@ -74,6 +76,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('peserta');
         })->name('peserta');
 
+        // Route untuk bank soal checkbox
+        Route::get('banksoalcheckbox', [BankSoalControllerCheckbox::class, 'index'])->name('banksoalcheckbox');
+
         // Route show bank soal
         Route::get('bank-soal', [BankSoalController::class, 'index'])->name('bank.soal');
 
@@ -81,7 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('bank-soal/{id}', [BankSoalController::class, 'destroy'])->name('bank.soal.destroy');
 
         // Route edit bank soal
-        Route::put('bank-soal/update/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
+        Route::put('bank-soal/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
         Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
 
         // Route tambah bank soal
@@ -99,6 +104,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{matakuliah}/edit', [MatkulController::class, 'edit'])->name('edit');
             Route::put('/{matakuliah}', [MatkulController::class, 'update'])->name('update');
             Route::delete('/{matakuliah}', [MatkulController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('jenis-ujian')->name('jenis-ujian.')->group(function () {
+            Route::get('/', [JenisUjianController::class, 'index'])->name('manager');
+            Route::get('{id}/edit', [JenisUjianEditController::class, 'edit'])->name('edit'); // Ensure the controller and method exist
+            Route::put('{id}', [JenisUjianEditController::class, 'update'])->name('update');
+            Route::delete('{user}', [JenisUjianController::class, 'delete'])->name('destroy');
+            Route::get('create', [JenisUjianEditController::class, 'create'])->name('create');
+            Route::post('/', [JenisUjianEditController::class, 'store'])->name('store');
         });
     });
 

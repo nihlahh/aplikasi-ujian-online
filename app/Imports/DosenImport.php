@@ -14,14 +14,20 @@ class DosenImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
-        // Menambahkan log untuk melihat data yang diterima dari file Excel
-        Log::debug('Data yang diterima:', ['rows' => $rows]);
-
         foreach ($rows as $row) {
-            // Debugging data per baris
-            Log::debug('Processing row:', ['row' => $row]);
+            if (Dosen::where('nip', $row['nip'])->exists()) {
+                throw new \Exception('NIP ' . $row['nip'] . ' sudah ada di database');
+            }
+            if (Dosen::where('nama', $row['name'])->exists()) {
+                throw new \Exception('Nama ' . $row['name'] . ' sudah ada di database');
+            }
+            if (Dosen::where('email', $row['email'])->exists()) {
+                throw new \Exception('Email ' . $row['email'] . ' sudah ada di database');
+            }
+        }
 
-            // Cek atau buat user berdasarkan email
+        // Jika semua baris lolos, baru lakukan insert
+        foreach ($rows as $row) {
             $user = User::firstOrCreate(
                 ['email' => $row['email']],
                 [
@@ -30,27 +36,15 @@ class DosenImport implements ToCollection, WithHeadingRow
                     'password' => Hash::make($row['password'] ?? 'password123'),
                 ]
             );
-
-            Log::debug('User created or found:', ['user' => $user]);
-
-            // Menambahkan role dosen
             $user->assignRole('dosen');
 
-            // Cek atau buat dosen
-            $dosen = Dosen::updateOrCreate(
-                ['nip' => $row['nip']],
-                [
-                    'nama'     => $row['name'],
-                    // 'email'    => $row['email'],
-                    'aktif'    => $row['aktif'] ?? 'Y',
-                    // 'roles'    => $row['roles'] ?? 'dosen',
-                    'password' => Hash::make($row['password'] ?? 'password123'),
-                ]
-            );
-
-            Log::debug('Dosen created or updated:', ['dosen' => $dosen]);
+            Dosen::create([
+                'nip'      => $row['nip'],
+                'nama'     => $row['name'],
+                'email'    => $row['email'],
+                'aktif'    => $row['aktif'] ?? 'Y',
+                'password' => Hash::make($row['password'] ?? 'password123'),
+            ]);
         }
-
-        Log::debug('Import process completed successfully');
     }
 }

@@ -28,7 +28,7 @@ export default function ImportDosen() {
     <AppLayout>
       <Head title="Import Data Dosen" />
 
-      <div className="p-6 space-y-">
+      <div className="p-6 space-y-4">
         <h1 className="text-2xl font-semibold">Import Data Dosen</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">

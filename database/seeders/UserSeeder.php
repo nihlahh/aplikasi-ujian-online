@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
         // assign permission ke role (gatau bener apa gk, tapi kurang lebihnya gitu)
         $admin->givePermissionTo(['lihat-nilai', 'atur-jadwal']);
         $superAdmin->givePermissionTo(Permission::all());
-        $dosen->givePermissiontTo(Permission::all());
+        $dosen->givePermissionTo(Permission::all());
 
         $user = User::updateOrCreate(
             ['email' => 'admin@admin.com'],

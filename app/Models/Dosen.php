@@ -19,7 +19,6 @@ class Dosen extends Model
         'password',
         'aktif',
         'email',
-        'roles',
     ];
 
     public function user(){

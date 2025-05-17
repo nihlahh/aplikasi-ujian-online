@@ -7,6 +7,7 @@ use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\BankSoalControllerCheckbox;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\ExamScheduleController;
+use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JenisUjianEditController;
 use Inertia\Inertia;
@@ -95,7 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('bank.soal.create');
 
         Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
-                
+
         // Route untuk matakuliah dipindahkan ke dalam grup master-data
         Route::prefix('matakuliah')->name('matakuliah.')->group(function () {
             Route::get('/', [MatkulController::class, 'index'])->name('index');
@@ -104,6 +105,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{matakuliah}/edit', [MatkulController::class, 'edit'])->name('edit');
             Route::put('/{matakuliah}', [MatkulController::class, 'update'])->name('update');
             Route::delete('/{matakuliah}', [MatkulController::class, 'destroy'])->name('destroy');
+        });
+
+        // Route untuk Event
+        Route::prefix('event')->name('event.')->group(function () {
+            Route::get('/', [EventController::class, 'index'])->name('index');
+            Route::get('/create', [EventController::class, 'create'])->name('create');
+            Route::post('/', [EventController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [EventController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [EventController::class, 'update'])->name('update');
+            Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('jenis-ujian')->name('jenis-ujian.')->group(function () {

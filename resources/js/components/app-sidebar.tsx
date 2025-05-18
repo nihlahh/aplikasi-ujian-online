@@ -78,6 +78,11 @@ const items: MainNavItem[] = [
                 href: '/master-data/matakuliah',
             },
             {
+                title: 'Event',
+                icon: BookA,
+                href: '/master-data/event',
+            },
+            {
                 title: 'Bank Soal Checkbox',
                 icon: BookA,
                 href: '/master-data/banksoalcheckbox',

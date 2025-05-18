@@ -9,8 +9,10 @@ use App\Http\Controllers\PesertaManagerController;
 use App\Http\Controllers\PesertaManagerEditController;
 use App\Http\Controllers\PesertaImportController;
 use App\Http\Controllers\BankSoalController;
-use App\Http\Controllers\JenisUjianController;
+use App\Http\Controllers\JenisUjianEditController;
 use App\Http\Controllers\ExamScheduleController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\JenisUjianController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Matakuliah;
@@ -46,9 +48,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{examSchedule}', [ExamScheduleController::class, 'destroy'])->name('destroy');
     });
 
+    // ⚠️ Dulu name-nya 'peserta', diganti supaya tidak bentrok dengan master-data.peserta.*
     Route::get('rekap-nilai', function () {
         return Inertia::render('peserta');
-    })->name('peserta');
+    })->name('rekap.nilai');
 
     // Buat route yang punya submenu, bisa dimasukkan ke dalam group
     // contohnya kek gini buat master-data
@@ -69,30 +72,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('kategori-ujian');
         })->name('kategori.ujian');
 
-        Route::get('jenis-ujian', function () {
-            return Inertia::render('jenis-ujian');
-        })->name('jenis.ujian');
+        // ⚠️ Komentar karena bentrok dengan grup 'jenis-ujian' di bawah
+        // Route::get('jenis-ujian', function () {
+        //     return Inertia::render('jenis-ujian');
+        // })->name('jenis.ujian');
 
         Route::get('soal', function () {
             return Inertia::render('soal');
         })->name('soal');
 
-
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
-        Route::get('jenisujian', [JenisUjianController::class, 'index']);
+        Route::get('jenisujian', [JenisUjianController::class, 'index']); // ini tidak pakai name
 
+        // ⚠️ Dulu name-nya 'peserta', diganti agar tidak bentrok
         Route::get('paket-soal', function () {
             return Inertia::render('peserta');
-        })->name('peserta');
-
-        Route::prefix('dosen')->name('dosen.')->group(function () {
-            Route::get('/', [DosenManagerController::class, 'index'])->name('manager');
-            Route::get('{id}/edit', [DosenManagerEditController::class, 'edit'])->name('edit');
-            Route::put('{id}', [DosenManagerEditController::class, 'update'])->name('update');
-            Route::delete('{user}', [DosenManagerController::class, 'delete'])->name('destroy');
-            Route::get('create', [DosenManagerEditController::class, 'create'])->name('create');
-            Route::post('/', [DosenManagerEditController::class, 'store'])->name('store');
-        });
+        })->name('paket.soal');
 
         Route::prefix('peserta')->name('peserta.')->group(function () {
             Route::get('/', [PesertaManagerController::class, 'index'])->name('manager');
@@ -104,11 +99,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('import', [PesertaImportController::class, 'import'])->name('import');
         });
 
+        // Grup route untuk halaman tampilan import peserta
         Route::prefix('import')->name('import.')->group(function () {
             Route::get('/', [PesertaImportController::class, 'importView'])->name('view');
         });
-
-
 
         // Route show bank soal
         Route::get('bank-soal', [BankSoalController::class, 'index'])->name('bank.soal');
@@ -136,6 +130,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/{matakuliah}', [MatkulController::class, 'update'])->name('update');
             Route::delete('/{matakuliah}', [MatkulController::class, 'destroy'])->name('destroy');
         });
+
+        // Route untuk Event
+        Route::prefix('event')->name('event.')->group(function () {
+            Route::get('/', [EventController::class, 'index'])->name('index');
+            Route::get('/create', [EventController::class, 'create'])->name('create');
+            Route::post('/', [EventController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [EventController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [EventController::class, 'update'])->name('update');
+            Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('jenis-ujian')->name('jenis-ujian.')->group(function () {
+            Route::get('/', [JenisUjianController::class, 'index'])->name('manager');
+            Route::get('{id}/edit', [JenisUjianEditController::class, 'edit'])->name('edit'); // Ensure the controller and method exist
+            Route::put('{id}', [JenisUjianEditController::class, 'update'])->name('update');
+            Route::delete('{user}', [JenisUjianController::class, 'delete'])->name('destroy');
+            Route::get('create', [JenisUjianEditController::class, 'create'])->name('create');
+            Route::post('/', [JenisUjianEditController::class, 'store'])->name('store');
+        });
     });
 
     Route::middleware(['role:super_admin'])->group(function () {
@@ -152,9 +165,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('create', [UserManagerEditController::class, 'create'])->name('create');
                 Route::post('/', [UserManagerEditController::class, 'store'])->name('store');
             });
-
-
-
 
             Route::get('roles', function () {
                 return Inertia::render('user-management/role-manager');

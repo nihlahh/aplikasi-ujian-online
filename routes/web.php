@@ -9,7 +9,6 @@ use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\BankSoalControllerCheckbox;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\ExamScheduleController;
-use App\Http\Controllers\KategoriUjianEditController;
 use App\Http\Controllers\PaketSoalController;
 use App\Http\Controllers\PaketSoalEditController;
 use Illuminate\Support\Facades\Route;
@@ -93,7 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
 
         Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
-                
+
         // Route untuk matakuliah dipindahkan ke dalam grup master-data
         Route::prefix('matakuliah')->name('matakuliah.')->group(function () {
             Route::get('/', [MatkulController::class, 'index'])->name('index');

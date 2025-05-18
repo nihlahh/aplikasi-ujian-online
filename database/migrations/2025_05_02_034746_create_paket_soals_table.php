@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('data_db')->create('paket_soals', function (Blueprint $table) {
-            $table->id();
-            $table->integer('kode_bidang');
-            $table->string('nama_paket');
-            $table->timestamps();
-        });
+        if(!Schema::connection('data_db')->hasTable('paket_soals')) {
+            Schema::connection('data_db')->create('paket_soals', function (Blueprint $table) {
+                $table->id();
+                $table->integer('kode_bidang');
+                $table->string('nama_paket');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

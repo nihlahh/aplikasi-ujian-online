@@ -15,6 +15,9 @@ use App\Http\Controllers\JenisUjianEditController;
 use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\JenisUjianController;
+use App\Http\Controllers\BankSoalControllerCheckbox;
+use App\Http\Controllers\PaketSoalController;
+use App\Http\Controllers\PaketSoalEditController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Matakuliah;
@@ -63,9 +66,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('dashboard');
         })->name('index');
 
-        // Route::get('peserta', function () {
-        //     return Inertia::render('peserta');
-        // })->name('peserta');
+        Route::get('peserta', function () {
+            return Inertia::render('peserta');
+        })->name('peserta');
 
         Route::get('dosen', function () {
             return Inertia::render('dosen');

@@ -48,10 +48,6 @@ const formSchema = z.object({
         message: 'NIP must be at least 2 characters.',
     }),
     aktif: z.boolean(),
-    dosen: z.object({
-        nip: z.string(),
-        aktif: z.boolean(),
-    }),
 });
 
 export default function Dashboard() {
@@ -76,15 +72,12 @@ export default function Dashboard() {
             email: user?.email ?? '',
             password: '',
             roles: user?.roles?.length ? user.roles : [],
-            dosen: {
-                nip: user?.dosen?.nip ?? '',
-                aktif: user?.dosen?.aktif ?? false,
-            },
+            nip: user?.dosen?.nip ?? '',
+            aktif: user?.dosen?.aktif ?? false,
         },
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log('Form Values:', values); // Debugging
         if (isEdit) {
             router.put(
                 route('master-data.dosen.update', user.id),
@@ -98,10 +91,9 @@ export default function Dashboard() {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        console.log('User updated successfully!');
+                        // Success handler
                     },
                     onError: (errors) => {
-                        console.error('Error:', errors);
                         if (errors.email) {
                             toast.error(errors.email);
                         }
@@ -122,14 +114,12 @@ export default function Dashboard() {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        console.log('User created successfully!');
+                        // Success handler
                     },
                     onError: (errors) => {
-                        console.error('Error:', errors);
                         if (errors.email) {
                             toast.error(errors.email);
                         }
-
                         if (errors.password) {
                             toast.error(errors.password);
                         }

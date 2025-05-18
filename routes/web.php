@@ -7,7 +7,6 @@ use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\JenisUjianController;
 use App\Http\Controllers\MatkulController;
 use App\Http\Controllers\UserManagerController;
-use App\Http\Controllers\UserManagerCreateController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\DosenImportController;
 use Illuminate\Support\Facades\Route;
@@ -48,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('rekap-nilai', function () {
         return Inertia::render('peserta');
-    })->name('peserta');
+    })->name('rekap-nilai.peserta');
 
     // Buat route yang punya submenu, bisa dimasukkan ke dalam group
     // contohnya kek gini buat master-data
@@ -63,19 +62,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('dosen', function () {
             return Inertia::render('peserta');
-        })->name('peserta');
+        })->name('dosen');
 
         Route::get('kategori-ujian', function () {
             return Inertia::render('peserta');
-        })->name('peserta');
+        })->name('kategori-ujian');
 
         Route::get('jenis-ujian', function () {
             return Inertia::render('peserta');
-        })->name('peserta');
+        })->name('jenis-ujian');
 
         Route::get('soal', function () {
             return Inertia::render('peserta');
-        })->name('peserta');
+        })->name('soal');
 
 
         Route::prefix('dosen')->name('dosen.')->group(function () {
@@ -84,7 +83,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('{id}', [DosenManagerEditController::class, 'update'])->name('update');
             Route::delete('{user}', [DosenManagerController::class, 'delete'])->name('destroy');
             Route::get('create', [DosenManagerEditController::class, 'create'])->name('create');
-            // Route::post('imports', [DosenManagerController::class, 'import'])->name('import');
             Route::post('/', [DosenManagerEditController::class, 'store'])->name('store');
             Route::post('import', [DosenImportController::class, 'import'])->name('import');
         });

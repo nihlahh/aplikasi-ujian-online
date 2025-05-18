@@ -48,9 +48,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{examSchedule}', [ExamScheduleController::class, 'destroy'])->name('destroy');
     });
 
-    // ⚠️ Dulu name-nya 'peserta', diganti supaya tidak bentrok dengan master-data.peserta.*
+
     Route::get('rekap-nilai', function () {
-        return Inertia::render('peserta');
+        return Inertia::render('rekap-nilai');
     })->name('rekap.nilai');
 
     // Buat route yang punya submenu, bisa dimasukkan ke dalam group
@@ -72,11 +72,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('kategori-ujian');
         })->name('kategori.ujian');
 
-        // ⚠️ Komentar karena bentrok dengan grup 'jenis-ujian' di bawah
-        // Route::get('jenis-ujian', function () {
-        //     return Inertia::render('jenis-ujian');
-        // })->name('jenis.ujian');
-
         Route::get('soal', function () {
             return Inertia::render('soal');
         })->name('soal');
@@ -84,9 +79,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
         Route::get('jenisujian', [JenisUjianController::class, 'index']); // ini tidak pakai name
 
-        // ⚠️ Dulu name-nya 'peserta', diganti agar tidak bentrok
+        
         Route::get('paket-soal', function () {
-            return Inertia::render('peserta');
+            return Inertia::render('paket-soal');
         })->name('paket.soal');
 
         Route::prefix('peserta')->name('peserta.')->group(function () {

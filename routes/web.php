@@ -59,21 +59,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('dashboard');
         })->name('index');
 
-        // Route::get('peserta', function () {
-        //     return Inertia::render('peserta');
-        // })->name('peserta');
+        Route::get('peserta', function () {
+            return Inertia::render('peserta');
+        })->name('peserta');
 
-        // Route::get('dosen', function () {
-        //     return Inertia::render('peserta');
-        // })->name('peserta');
+        Route::get('dosen', function () {
+            return Inertia::render('peserta');
+        })->name('peserta');
 
-        // Route::get('kategori-ujian', function () {
-        //     return Inertia::render('peserta');
-        // })->name('peserta');
+        Route::get('kategori-ujian', function () {
+            return Inertia::render('peserta');
+        })->name('peserta');
 
-        // Route::get('jenis-ujian', function () {
-        //     return Inertia::render('peserta');
-        // })->name('peserta');
+        Route::get('jenis-ujian', function () {
+            return Inertia::render('peserta');
+        })->name('peserta');
 
         Route::get('jenisujian', [JenisUjianController::class, 'index']);
 

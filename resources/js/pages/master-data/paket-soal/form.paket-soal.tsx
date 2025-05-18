@@ -69,12 +69,12 @@ export default function Dashboard() {
   const [kategoriOptions, setKategoriOptions] = useState<Array<{ kode: string; value: string }>>([]);
   const [jenisOptions, setJenisOptions] = useState<Array<{ kode: string; value: string }>>([]);
 
+  const kategori = form.watch('kategori_ujian');
+  const jenis = form.watch('jenis_ujian');
+
   useEffect(() => {
     const kategoriSet = new Set<string>();
     const jenisSet = new Set<string>();
-
-    const jenis = form.watch('jenis_ujian');
-    const kategori = form.watch('kategori_ujian');
 
     const filteredJenis: Array<{ kode: string; value: string }> = [];
     const filteredKategori: Array<{ kode: string; value: string }> = [];
@@ -111,7 +111,7 @@ export default function Dashboard() {
 
     setJenisOptions(filteredJenis);
     setKategoriOptions(filteredKategori);
-  }, [form.watch('kategori_ujian'), form.watch('jenis_ujian')]);
+  }, [kategori, jenis, options]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const matched = options.find(

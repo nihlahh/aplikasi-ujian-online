@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\KategoriUjianController;
 use App\Http\Controllers\MatkulController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserManagerController;
 use App\Http\Controllers\UserManagerEditController;
 use App\Http\Controllers\DosenManagerController;
@@ -13,9 +15,13 @@ use App\Http\Controllers\JenisUjianEditController;
 use App\Http\Controllers\ExamScheduleController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\JenisUjianController;
+use App\Http\Controllers\BankSoalControllerCheckbox;
+use App\Http\Controllers\PaketSoalController;
+use App\Http\Controllers\PaketSoalEditController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Matakuliah;
+use App\Models\PaketSoal;
 
 // Custom route binding untuk Matakuliah model
 Route::bind('matakuliah', function ($value) {
@@ -113,9 +119,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('bank-soal/create', function () {
             return Inertia::render('banksoalcreate');
         })->name('bank.soal.create');
+        // Route edit bank soal
+        Route::put('bank-soal/{id}', [BankSoalController::class, 'update'])->name('bank.soal.update');
+        Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
 
         Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
-
+                
         // Route untuk matakuliah dipindahkan ke dalam grup master-data
         Route::prefix('matakuliah')->name('matakuliah.')->group(function () {
             Route::get('/', [MatkulController::class, 'index'])->name('index');
@@ -126,14 +135,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{matakuliah}', [MatkulController::class, 'destroy'])->name('destroy');
         });
 
-        // Route untuk Event
-        Route::prefix('event')->name('event.')->group(function () {
-            Route::get('/', [EventController::class, 'index'])->name('index');
-            Route::get('/create', [EventController::class, 'create'])->name('create');
-            Route::post('/', [EventController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [EventController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [EventController::class, 'update'])->name('update');
-            Route::delete('/{id}', [EventController::class, 'destroy'])->name('destroy');
+        // Route untuk paket soal
+        Route::prefix('paket-soal')->name('paket-soal.')->group(function () {
+            Route::get('/', [PaketSoalController::class, 'index'])->name('manager');
+            Route::get('/create', [PaketSoalEditController::class, 'create'])->name('create');
+            Route::post('/', [PaketSoalEditController::class, 'store'])->name('store');
+            Route::get('/{paket_soal}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
+            Route::put('/{paket_soal}', [PaketSoalEditController::class, 'update'])->name('update');
+            Route::delete('/{paket_soal}', [PaketSoalController::class, 'delete'])->name('destroy');
+            Route::post('/store',[PaketSoalEditController::class, 'store_data'])->name('store_data');
+        });
+
+        Route::prefix('bank-soal-checkbox')->name('bank-soal-checkbox.')->group(function () {
+            Route::get('/', [BankSoalControllerCheckbox::class, 'index'])->name('index');
+            Route::get('/{paket_soal}/edit', [BankSoalControllerCheckbox::class, 'edit'])->name('edit');
+            Route::put('/{paket_soal}', [BankSoalControllerCheckbox::class, 'update'])->name('update');
         });
 
         Route::prefix('jenis-ujian')->name('jenis-ujian.')->group(function () {
@@ -166,7 +182,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             })->name('roles');
         });
     });
-});
 
+});
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

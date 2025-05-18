@@ -62,20 +62,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('peserta');
 
         Route::get('dosen', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+            return Inertia::render('dosen');
+        })->name('dosen');
 
         Route::get('kategori-ujian', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+            return Inertia::render('kategori-ujian');
+        })->name('kategori.ujian');
 
         Route::get('jenis-ujian', function () {
-            return Inertia::render('peserta');
-        })->name('peserta');
+            return Inertia::render('jenis-ujian');
+        })->name('jenis.ujian');
 
         Route::get('soal', function () {
-            return Inertia::render('dosen-manager');
-        })->name('peserta');
+            return Inertia::render('soal');
+        })->name('soal');
 
 
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
@@ -100,7 +100,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('{id}', [PesertaManagerEditController::class, 'update'])->name('update');
             Route::delete('{peserta}', [PesertaManagerController::class, 'delete'])->name('destroy');
             Route::get('create', [PesertaManagerEditController::class, 'create'])->name('create');
-            Route::post('import', [PesertaManagerController::class, 'import'])->name('import');
             Route::post('/', [PesertaManagerEditController::class, 'store'])->name('store');
             Route::post('import', [PesertaImportController::class, 'import'])->name('import');
         });

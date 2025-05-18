@@ -58,28 +58,4 @@ class PesertaManagerController extends Controller
         return redirect()->back()->with('success', 'Data berhasil diupdate');
     }
 
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:csv,txt',
-        ]);
-
-        $file = $request->file('file');
-        $data = array_map('str_getcsv', file($file->getRealPath()));
-
-        foreach ($data as $row) {
-            // Sesuaikan index kolom dengan file CSV Anda
-            Peserta::updateOrCreate(
-                ['nis' => $row[0]],
-                [
-                    'nama' => $row[1] ?? null,
-                    'jurusan' => $row[2] ?? null,
-                    'status' => $row[3] ?? 1,
-                    // tambahkan kolom lain sesuai kebutuhan
-                ]
-            );
-        }
-
-        return redirect()->back()->with('success', 'Import peserta berhasil');
-    }
 }

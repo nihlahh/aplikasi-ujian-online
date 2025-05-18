@@ -18,15 +18,22 @@ const formSchema = z.object({
         .string()
         .optional()
         .refine((val) => !val || val.length >= 8, { message: 'Password must be at least 8 characters.' }),
-    aktif: z.number().min(0, { message: 'Status is required.' }),
+    status: z.number().min(0, { message: 'Status is required.' }),
     jurusan: z.number().min(0, { message: 'Jurusan is required.' }),
     nis: z.string().min(5, { message: 'NIS must be at least 5 characters.' }),
     nama: z.string().min(2, { message: 'Nama must be at least 2 characters.' }),
-    status: z.number().optional(),
 });
 
 export default function PesertaForm() {
-    const { peserta, jurusanList } = usePage<{ peserta: any; jurusanList: { id_jurusan: number; nama_jurusan: string }[] }>().props;
+    type PesertaType = {
+        id?: number;
+        username: string;
+        nis: string;
+        nama: string;
+        status: number;
+        jurusan: number;
+    };
+    const { peserta, jurusanList } = usePage<{ peserta: PesertaType; jurusanList: { id_jurusan: number; nama_jurusan: string }[] }>().props;
     const isEdit = !!peserta;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -46,7 +53,6 @@ export default function PesertaForm() {
             username: peserta?.username ?? '',
             password: isEdit ? '' : 'password123',
             status: peserta?.status ?? 0,
-            aktif: peserta?.aktif ?? 0,
             jurusan: peserta?.jurusan ?? 0,
             nis: peserta?.nis ?? '',
             nama: peserta?.nama ?? '',
@@ -66,7 +72,7 @@ export default function PesertaForm() {
                     preserveScroll: true,
                     // onSuccess tidak perlu router.visit lagi jika backend sudah redirect ke page yang benar
                     onSuccess: () => {},
-                    onError: (errors) => {
+                    onError: () => {
                         toast.error('Failed to update peserta.');
                     },
                 },
@@ -77,8 +83,7 @@ export default function PesertaForm() {
                 onSuccess: () => {
                     console.log('Peserta created successfully!'); // Log jika berhasil
                 },
-                onError: (errors) => {
-                    console.error('Error:', errors); // Log error jika gagal
+                onError: () => { // Log error jika gagal
                     toast.error('Failed to create peserta.');
                 },
             });
@@ -110,7 +115,6 @@ export default function PesertaForm() {
                                 </FormItem>
                             )}
                         />
-                        {true && (
                             <FormField
                                 control={form.control}
                                 name="password"
@@ -120,13 +124,11 @@ export default function PesertaForm() {
                                         <FormControl>
                                             <PasswordInput placeholder="Enter password" {...field} />
                                         </FormControl>
-                                        <p className="mt-1 text-xs text-gray-500">*kosongkan jika tidak ingin merubah password</p>
+                                        {isEdit && <p className="mt-1 text-xs text-gray-500">*kosongkan jika tidak ingin merubah password</p>}
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                        )}
-
                         <FormField
                             control={form.control}
                             name="nama"

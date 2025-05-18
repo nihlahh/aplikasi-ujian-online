@@ -18,7 +18,6 @@ class Peserta extends Model
 
     // Kolom yang bisa diisi mass-assignment
     protected $fillable = [
-        'id',
         'username',
         'password',
         'status', // yang dipake itu status ya bukan aktif

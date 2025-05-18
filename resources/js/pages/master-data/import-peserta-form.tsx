@@ -31,10 +31,6 @@ export default function ImportPeserta() {
         });
     };
 
-    const handleChooseFile = () => {
-        fileInputRef.current?.click();
-    };
-
     return (
         <AppLayout>
             <Head title="Import Data Peserta" />

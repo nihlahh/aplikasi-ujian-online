@@ -30,7 +30,7 @@ class PesertaImportController extends Controller
             Excel::import(new PesertaImport, $request->file('file'));
 
             Log::debug('Import process completed successfully');  // Debugging setelah import selesai
-            return redirect()->back()->with('success', 'Import data dosen berhasil.');
+            return redirect()->back()->with('success', 'Import data peserta berhasil.');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             // Log error jika ada masalah dalam validasi Excel
             Log::error('Excel validation error: ', ['error' => $e->getMessage()]);

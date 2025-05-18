@@ -72,20 +72,20 @@ export default function UserManager() {
     );
 }
 
-const RoleDecorator: React.FC<{ role: string }> = ({ role }) => {
-    switch (role) {
-        case 'super_admin':
-            return <span className="bg-button-danger mr-2 rounded p-2 text-white shadow">{role}</span>;
-        case 'admin':
-            return <span className="mr-2 rounded bg-yellow-500 p-2 text-white shadow">{role}</span>;
-        case 'dosen':
-            return <span className="mr-2 rounded bg-pink-500 p-2 text-white shadow">{role}</span>;
-        case 'peserta':
-            return <span className="mr-2 rounded bg-pink-500 p-2 text-white shadow">{role}</span>;
-        default:
-            return <span className="mr-2 text-white">{role}</span>;
-    }
-};
+// const RoleDecorator: React.FC<{ role: string }> = ({ role }) => {
+//     switch (role) {
+//         case 'super_admin':
+//             return <span className="bg-button-danger mr-2 rounded p-2 text-white shadow">{role}</span>;
+//         case 'admin':
+//             return <span className="mr-2 rounded bg-yellow-500 p-2 text-white shadow">{role}</span>;
+//         case 'dosen':
+//             return <span className="mr-2 rounded bg-pink-500 p-2 text-white shadow">{role}</span>;
+//         case 'peserta':
+//             return <span className="mr-2 rounded bg-pink-500 p-2 text-white shadow">{role}</span>;
+//         default:
+//             return <span className="mr-2 text-white">{role}</span>;
+//     }
+// };
 
 function UserTable({ data: userData, pageFilters: filters }: { data: PaginatedResponse<Peserta>; pageFilters: PageFilter }) {
     const [open, setOpen] = useState(false);

@@ -17,19 +17,22 @@ class MonitoringUjianController extends Controller
         $search = $request->input('search', '');
         $page = $request->input('page', 1);
 
-        $query = Penjadwalan::query();
-        
+        // Eager load the event relationship to get nama_event
+        $query = Penjadwalan::with('event');
+
         // Apply search filter if provided
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('tipe_ujian', 'like', "%{$search}%")
-                  ->orWhere('id_paket_ujian', 'like', "%{$search}%")
-                  ->orWhere('jenis_ujian', 'like', "%{$search}%");
+                    ->orWhereHas('event', function ($q) use ($search) {
+                        $q->where('nama_event', 'like', "%{$search}%");
+                    })
+                    ->orWhere('jenis_ujian', 'like', "%{$search}%");
             });
         }
-        
+
         $ujianList = $query->paginate($perPage);
-        
+
         // Transform the data to match the expected format in the frontend
         $ujianList->getCollection()->transform(function ($item) {
             return [
@@ -44,7 +47,7 @@ class MonitoringUjianController extends Controller
                 'tipe' => $item->tipe,
             ];
         });
-        
+
         return Inertia::render('monitoring/monitoring', [
             'ujianList' => $ujianList,
             'filters' => [
@@ -60,8 +63,8 @@ class MonitoringUjianController extends Controller
      */
     public function show($id)
     {
-        $ujian = Penjadwalan::findOrFail($id);
-        
+        $ujian = Penjadwalan::with('event')->findOrFail($id);
+
         // Transform to expected format
         $transformedUjian = [
             'id' => $ujian->id_penjadwalan,
@@ -74,7 +77,7 @@ class MonitoringUjianController extends Controller
             'kuota' => $ujian->kuota,
             'tipe' => $ujian->tipe,
         ];
-        
+
         return Inertia::render('monitoring/detail', [
             'ujian' => $transformedUjian,
         ]);

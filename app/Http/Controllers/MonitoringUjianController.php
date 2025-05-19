@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MonitoringUjian;
+use App\Models\Penjadwalan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,7 +17,7 @@ class MonitoringUjianController extends Controller
         $search = $request->input('search', '');
         $page = $request->input('page', 1);
 
-        $query = MonitoringUjian::query();
+        $query = Penjadwalan::query();
         
         // Apply search filter if provided
         if ($search) {
@@ -60,7 +60,7 @@ class MonitoringUjianController extends Controller
      */
     public function show($id)
     {
-        $ujian = MonitoringUjian::findOrFail($id);
+        $ujian = Penjadwalan::findOrFail($id);
         
         // Transform to expected format
         $transformedUjian = [

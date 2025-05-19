@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('match_soals');
+        Schema::connection('data_db')->dropIfExists('match_soals');
     }
 };

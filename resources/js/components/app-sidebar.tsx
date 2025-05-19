@@ -44,7 +44,7 @@ const items: MainNavItem[] = [
         subitem: [
             {
                 title: 'Peserta',
-                href: '/master-data/peserta',
+                href: '/master-data/test',
                 icon: UserRound,
             },
             {
@@ -76,6 +76,16 @@ const items: MainNavItem[] = [
                 title: 'Matakuliah',
                 icon: BookA,
                 href: '/master-data/matakuliah',
+            },
+            {
+                title: 'Event',
+                icon: BookA,
+                href: '/master-data/event',
+            },
+            {
+                title: 'Bank Soal Checkbox',
+                icon: BookA,
+                href: '/master-data/banksoalcheckbox',
             },
         ],
     },

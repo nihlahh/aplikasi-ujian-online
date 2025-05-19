@@ -59,23 +59,8 @@ jobs:
           echo "DB2_CONNECTION=sqlite" >> .env
           echo "DB2_DATABASE=$GITHUB_WORKSPACE/database/data_db.sqlite" >> .env
 
-      - name: Setup database connections
-        run: |
-          php -r "
-            require __DIR__ . '/vendor/autoload.php';
-            \$app = require __DIR__ . '/bootstrap/app.php';
-            \$app->boot();
-            \$config = \$app->make('config');
-            \$config->set('database.connections.data_db.driver', 'sqlite');
-            \$config->set('database.connections.data_db.database', __DIR__ . '/database/data_db.sqlite');
-            echo 'Database connections configured successfully!';
-          "
-
       - name: Run Migrations
-        run: |
-          php artisan config:clear
-          php artisan cache:clear
-          php artisan migrate --force
+        run: php artisan config:clear && php artisan migrate --force
 
       - name: Tests
         run: ./vendor/bin/pest

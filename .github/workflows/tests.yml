@@ -43,8 +43,17 @@ jobs:
       - name: Copy Environment File
         run: cp .env.example .env
 
+      - name: Configure Environment for CI
+        run: |
+          sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=sqlite/" .env
+          sed -i "s/DB_DATABASE=.*/DB_DATABASE=:memory:/" .env
+          touch database/database.sqlite
+
       - name: Generate Application Key
         run: php artisan key:generate
+
+      - name: Setup Database
+        run: php artisan migrate --force
 
       - name: Tests
         run: ./vendor/bin/pest

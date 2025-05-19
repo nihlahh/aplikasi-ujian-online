@@ -48,6 +48,9 @@ jobs:
           sed -i "s/DB_CONNECTION=.*/DB_CONNECTION=sqlite/" .env
           sed -i "s/DB_DATABASE=.*/DB_DATABASE=:memory:/" .env
           touch database/database.sqlite
+          # Configure data_db connection to use sqlite as well
+          echo "DB2_CONNECTION=sqlite" >> .env
+          echo "DB2_DATABASE=:memory:" >> .env
 
       - name: Generate Application Key
         run: php artisan key:generate

@@ -45,11 +45,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('monitoring-ujian', [App\Http\Controllers\MonitoringUjianController::class, 'index'])->name('monitoring.ujian');
     Route::get('monitoring-ujian/{id}', [App\Http\Controllers\MonitoringUjianController::class, 'show'])->name('monitoring.ujian.detail');
 
-
-    // Route::get('monitoring-ujian', function () {
-    //     return Inertia::render('peserta');
-    // })->name('monitoring.ujian');
-
     Route::prefix('jadwal-ujian')->name('exam-schedule.')->group(function () {
         Route::get('/', [ExamScheduleController::class, 'index'])->name('index');
         Route::get('/create', [ExamScheduleController::class, 'create'])->name('create');
@@ -90,7 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('matakuliah', [MatkulController::class, 'index'])->name('matakuliah');
         Route::get('jenisujian', [JenisUjianController::class, 'index']); // ini tidak pakai name
 
-        
+
         Route::get('paket-soal', function () {
             return Inertia::render('paket-soal');
         })->name('paket.soal');
@@ -129,7 +124,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('bank-soal/{id}/edit', [BankSoalController::class, 'edit'])->name('bank.soal.edit');
 
         Route::post('bank-soal', [BankSoalController::class, 'store'])->name('bank.soal.store');
-                
+
         // Route untuk matakuliah dipindahkan ke dalam grup master-data
         Route::prefix('matakuliah')->name('matakuliah.')->group(function () {
             Route::get('/', [MatkulController::class, 'index'])->name('index');
@@ -148,7 +143,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{paket_soal}/edit', [PaketSoalEditController::class, 'edit'])->name('edit');
             Route::put('/{paket_soal}', [PaketSoalEditController::class, 'update'])->name('update');
             Route::delete('/{paket_soal}', [PaketSoalController::class, 'delete'])->name('destroy');
-            Route::post('/store',[PaketSoalEditController::class, 'store_data'])->name('store_data');
+            Route::post('/store', [PaketSoalEditController::class, 'store_data'])->name('store_data');
         });
 
         Route::prefix('bank-soal-checkbox')->name('bank-soal-checkbox.')->group(function () {
@@ -187,7 +182,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             })->name('roles');
         });
     });
-
 });
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

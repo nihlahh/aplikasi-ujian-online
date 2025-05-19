@@ -17,13 +17,15 @@ class MonitoringUjianController extends Controller
         $search = $request->input('search', '');
         $page = $request->input('page', 1);
 
-        // Eager load the event relationship to get nama_event
-        $query = Penjadwalan::with('event');
+        // Eager load both event and jenis_ujian relationships
+        $query = Penjadwalan::with(['event', 'jenis_ujian']);
 
         // Apply search filter if provided
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('tipe_ujian', 'like', "%{$search}%")
+                $q->whereHas('jenis_ujian', function ($q) use ($search) {
+                    $q->where('nama', 'like', "%{$search}%");
+                })
                     ->orWhereHas('event', function ($q) use ($search) {
                         $q->where('nama_event', 'like', "%{$search}%");
                     })
@@ -63,7 +65,7 @@ class MonitoringUjianController extends Controller
      */
     public function show($id)
     {
-        $ujian = Penjadwalan::with('event')->findOrFail($id);
+        $ujian = Penjadwalan::with(['event', 'jenis_ujian'])->findOrFail($id);
 
         // Transform to expected format
         $transformedUjian = [

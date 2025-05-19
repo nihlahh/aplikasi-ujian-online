@@ -10,6 +10,7 @@ import { CustomTable } from '@/components/ui/c-table';
 import { EntriesSelector } from '@/components/ui/entries-selector';
 import { PaginationWrapper } from '@/components/ui/pagination-wrapper';
 import { SearchInputMenu } from '@/components/ui/search-input-menu';
+import { ChevronRight } from 'lucide-react';
 
 // Define interfaces for data types
 interface Ujian {
@@ -53,9 +54,6 @@ export default function Monitoring({ ujianList, filters, flash }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <ContentTitle title="Monitoring Ujian" showButton={false} />
-                    <Link href="/dashboard">
-                        <Button variant="default">Kembali</Button>
-                    </Link>
                 </div>
 
                 <div className="mt-4 flex items-center justify-between">
@@ -92,32 +90,32 @@ function UjianTable({ data: ujianList, pageFilters: filters }: { data: Paginated
     const columns = [
         {
             label: 'Tipe Ujian',
-            className: 'w-[150px]',
+            className: 'w-[150px] text-center',
             render: (ujian: Ujian) => ujian.tipe_ujian,
         },
         {
             label: 'Paket Ujian',
-            className: 'w-[200px]',
+            className: 'w-[200px] text-center',
             render: (ujian: Ujian) => ujian.paket_ujian,
         },
         {
             label: 'Kelompok',
-            className: 'w-[150px]',
+            className: 'w-[150px] text-center',
             render: (ujian: Ujian) => ujian.kelas_prodi,
         },
         {
             label: 'Tanggal Ujian',
-            className: 'w-[150px]',
+            className: 'w-[150px] text-center',
             render: (ujian: Ujian) => ujian.tanggal_ujian,
         },
         {
             label: 'Mulai',
-            className: 'w-[100px]',
+            className: 'w-[100px] text-center',
             render: (ujian: Ujian) => ujian.mulai,
         },
         {
             label: 'Selesai',
-            className: 'w-[100px]',
+            className: 'w-[100px] text-center',
             render: (ujian: Ujian) => ujian.selesai,
         },
         {
@@ -127,7 +125,7 @@ function UjianTable({ data: ujianList, pageFilters: filters }: { data: Paginated
         },
         {
             label: 'Tipe',
-            className: 'w-[100px]',
+            className: 'w-[100px] text-center',
             render: (ujian: Ujian) => (
                 <div className="flex justify-center">
                     <TipeBadge tipe={ujian.tipe} />
@@ -141,20 +139,7 @@ function UjianTable({ data: ujianList, pageFilters: filters }: { data: Paginated
                 <div className="flex justify-center">
                     <Link href={`/monitoring-ujian/${ujian.id}`}>
                         <Button variant="ghost" size="sm">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="h-4 w-4"
-                            >
-                                <path d="m9 18 6-6-6-6" />
-                            </svg>
+                            <ChevronRight />
                         </Button>
                     </Link>
                 </div>

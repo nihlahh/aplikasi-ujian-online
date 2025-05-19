@@ -46,8 +46,12 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
+      - name: Set CI Environment
+        run: echo "APP_ENV=ci" >> .env
+
       - name: Setup Database
         run: |
+          mkdir -p database
           touch database/database.sqlite
           touch database/data_db.sqlite
           echo "DB_CONNECTION=sqlite" >> .env
@@ -56,7 +60,7 @@ jobs:
           echo "DB2_DATABASE=$GITHUB_WORKSPACE/database/data_db.sqlite" >> .env
 
       - name: Run Migrations
-        run: php artisan migrate --force
+        run: php artisan config:clear && php artisan migrate --force
 
       - name: Tests
         run: ./vendor/bin/pest
